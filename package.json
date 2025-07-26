@@ -1,7 +1,7 @@
 {
-    "name": "workspace-keyboard-tutorial",
-    "displayName": "workspace-keyboard-tutorial",
-    "description": "Guide students through keyboard-based editing tasks.",
+    "name": "hackschule-keyboard-tutorial",
+    "displayName": "Hackschule Keyboard Tutorial",
+    "description": "Lerne die wichtigsten Grundlagen der Tastatur kennen",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.91.0"
@@ -9,8 +9,10 @@
     "categories": [
         "Other"
     ],
+    "repository": "https://github.com/specht/hackschule_keyboard_tutorial",
+    "icon": "media/icon.png",
     "activationEvents": [],
-    "main": "./extension.js",
+    "main": "./src/extension.js",
     "publisher": "gymnasiumsteglitz",
     "contributes": {
         "viewsContainers": {
