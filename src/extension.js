@@ -1,7 +1,5 @@
 const vscode = require("vscode");
-const path = require("path");
 const fs = require("fs/promises");
-const os = require("os");
 const yaml = require("yaml");
 let provider = null;
 
@@ -10,7 +8,7 @@ const TutorialViewProvider = require("./TutorialViewProvider");
 function watchUserActivity(context) {
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument((event) => {
-            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextDocument', event: event });
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextDocument', event: event, contents: event.document.getText() });
         }),
 
         vscode.workspace.onDidSaveTextDocument((event) => {

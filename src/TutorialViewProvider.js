@@ -20,7 +20,7 @@ class TutorialViewProvider {
                 state[key] = false;
             }
         }
-        fs.mkdirSync(tutorialDir, {recursive: true});
+        fs.mkdirSync(tutorialDir, { recursive: true });
         const stateFilePath = path.join(tutorialDir, '.state.json');
         if (fs.existsSync(stateFilePath)) {
             try {
@@ -38,7 +38,7 @@ class TutorialViewProvider {
     }
 
     writeCompletionState(state) {
-        fs.mkdirSync(tutorialDir, {recursive: true});
+        fs.mkdirSync(tutorialDir, { recursive: true });
         const stateFilePath = path.join(tutorialDir, '.state.json');
         fs.writeFileSync(stateFilePath, JSON.stringify(state), "utf8");
     }
@@ -93,9 +93,16 @@ class TutorialViewProvider {
                     let filePath = vscode.Uri.joinPath(this.context.extensionUri, step.file).fsPath;
                     let contents = fs.readFileSync(filePath, 'utf8');
                     let baseName = path.basename(filePath);
-                    fs.mkdirSync(tutorialDir, {recursive: true});
+                    fs.mkdirSync(tutorialDir, { recursive: true });
                     const tempFilePath = path.join(tutorialDir, baseName);
+
+                    let tempDoc = vscode.workspace.textDocuments.find(d => d.uri.fsPath === tempFilePath);
+                    if (tempDoc && tempDoc.isDirty) {
+                        await tempDoc.save();
+                    }
+
                     fs.writeFileSync(tempFilePath, contents, "utf8");
+
                     let doc = await vscode.workspace.openTextDocument(tempFilePath);
                     await vscode.window.showTextDocument(doc, { preview: false });
                     if (step.cursor) {

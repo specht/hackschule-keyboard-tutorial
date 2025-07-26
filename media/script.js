@@ -31,7 +31,7 @@ window.addEventListener('message', event => {
             clickStep(message.step);
             break;
         case 'onDidChangeTextDocument':
-            handleOnDidChangeTextDocument(message.event);
+            handleOnDidChangeTextDocument(message.event, message.contents);
             break;
         case 'onDidSaveTextDocument':
             handleOnDidSaveTextDocument(message.event);
@@ -206,4 +206,18 @@ window.addEventListener('DOMContentLoaded', function () {
 
 function checkBox(id) {
     return `<span id='${id}' class='check'><svg class="icon"><use href="#circle-dotted"></use></svg><svg class="icon"><use href="#check"></use></svg></span>`;
+}
+
+function setCheckBox(id, flag) {
+    let check = document.querySelector(`#instruction #${id}.check`);
+    if (flag) {
+        check.classList.add('checked');
+    } else {
+        check.classList.remove('checked');
+    }
+}
+
+function getCheckBox(id) {
+    let check = document.querySelector(`#instruction #${id}.check`);
+    return check.classList.contains('checked');
 }

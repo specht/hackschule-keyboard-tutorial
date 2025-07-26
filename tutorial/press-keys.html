@@ -123,7 +123,6 @@ catcher.addEventListener('keydown', function (e) {
 instruction.querySelector('#key_catcher').focus();
 
 function updateSolved() {
-    let finished = true;
     for (let table of div.querySelectorAll('table')) {
         let gotAll = true;
         for (let key of table.querySelectorAll('key')) {
@@ -143,10 +142,8 @@ function updateSolved() {
             table.querySelector('td .check').classList.add('checked');
         } else {
             table.querySelector('td .check').classList.remove('checked');
-            finished = false;
         }
         checkTaskSolved();
-        // if (finished) markTaskComplete();
     }
 }
 </script>

@@ -11,6 +11,8 @@ sections:
   steps:
   - heading: Navigieren mit Pfeiltasten
     key: navigate-arrow-keys
+  - heading: Zum Anfang / zum Ende einer Zeile springen
+    key: navigate-home-end
   - heading: Seitenweise blättern
     key: navigate-page-keys
   - heading: Zum Anfang / zum Ende der Datei springen
@@ -19,8 +21,10 @@ sections:
     key: navigate-goto-line
   - heading: Bildausschnitt verschieben
     key: navigate-move-region
-# - heading: Text markieren
-#   steps: []
+- heading: Text markieren
+  steps:
+  - heading: Text mit der Maus auswählen
+    key: select-with-mouse
 # - heading: Text bearbeiten
 #   steps:
 #   - heading: Text löschen

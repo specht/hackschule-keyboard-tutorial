@@ -1,0 +1,74 @@
+<yaml>
+file: tutorial/paragraph.txt
+cursor: [1, 1]
+</yaml>
+<h2>Text mit der Maus auswählen</h2>
+<p>
+    Du kannst mit der linken Maustaste Text auswählen, indem du die
+    Maustaste gedrückt hältst und die Maus bis zum Ende deiner
+    Auswahl schiebst.
+</p>
+
+<div class="hint">
+    <svg class="icon"><use href="#bulb"></use></svg>
+    Achtung: Das Auswählen von Text mit der Maus kann gefährlich sein,
+    weil du ungewollt Text verschieben kannst! Wenn du bereits Text
+    ausgewählt hast und den ausgewählten Text anklickst, triffst du keine
+    neue Auswahl, sondern beginnst, den markierten Text zu verschieben.
+</div>
+
+<table id="table"></table>
+
+<script>
+
+handleOnDidChangeTextEditorSelection = function(e) {
+    console.log(e.selections[0]);
+    let s = e.selections[0];
+    if (!getCheckBox('s1')) {
+        setCheckBox('s0', (s.start.line === 9 && s.start.character === 32 &&
+            s.end.line === 9 && s.end.character === 44));
+        checkTaskSolved();
+    }
+}
+
+handleOnDidChangeTextDocument = function(e, contents) {
+    let lines = contents.split("\n");
+    console.log(lines);
+    if (getCheckBox('s0')) {
+        if (lines.indexOf("was empty:  she did not like to  for fear of killing") >= 0 &&
+            lines.indexOf("fell past it.drop the jar") >= 0) {
+            setCheckBox('s1', true);
+        }
+        if (getCheckBox('s1')) {
+            if (lines.indexOf("was empty:  she did not like to drop the jar for fear of killing") >= 0 &&
+                lines.indexOf("fell past it.") >= 0) {
+                setCheckBox('s2', true);
+            }
+
+        }
+    }
+}
+
+let table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend',
+    `<td style='width: 1.2em;'>
+    ${checkBox('s0')}
+    </td><td>Markiere den Satzteil »drop the jar« in Zeile 10 mit der Maus</td></tr>`);
+
+table.insertAdjacentHTML('beforeend',
+    `<td style='width: 1.2em;'>
+    ${checkBox('s1')}
+    </td><td>Verschiebe den markierten Satzteil mit der Maus an das Ende des Textes</td></tr>`);
+
+table.insertAdjacentHTML('beforeend',
+    `<td style='width: 1.2em;'>
+    ${checkBox('s2')}
+    </td><td>Mach die Änderung rückgängig, indem du <key>Strg</key>+<key>Z</key> drückst</td></tr>`);
+
+table.insertAdjacentHTML('beforeend',
+    `<td style='width: 1.2em;'>
+    ${checkBox()}
+    </td><td>Nö</td></tr>`);
+
+</script>
