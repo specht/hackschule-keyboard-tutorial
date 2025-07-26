@@ -66,9 +66,9 @@ class TutorialViewProvider {
         webviewView.webview.html = html;
 
         webviewView.webview.onDidReceiveMessage(async message => {
-            console.log(`Message from webview: ${JSON.stringify(message)}`);
+            // console.log(`Message from webview: ${JSON.stringify(message)}`);
             if (message.command === 'load_step') {
-                console.log(`Loading step: ${message.key}`)
+                // console.log(`Loading step: ${message.key}`)
                 let step = {};
                 let yamlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.yaml`).fsPath;
                 let htmlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.html`).fsPath;
@@ -91,10 +91,8 @@ class TutorialViewProvider {
                 }
                 if (step.file) {
                     let filePath = vscode.Uri.joinPath(this.context.extensionUri, step.file).fsPath;
-                    console.log('filePath', filePath);
                     let contents = fs.readFileSync(filePath, 'utf8');
                     let baseName = path.basename(filePath);
-                    console.log('baseName', baseName);
                     fs.mkdirSync(tutorialDir, {recursive: true});
                     const tempFilePath = path.join(tutorialDir, baseName);
                     fs.writeFileSync(tempFilePath, contents, "utf8");
@@ -112,7 +110,6 @@ class TutorialViewProvider {
                         const editor = vscode.window.activeTextEditor;
                         if (editor) {
                             const position = new vscode.Position(step.scrollY - 1, 0);
-                            console.log('scrolling!!!', position)
                             await editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.AtTop);
                         }
                     }
@@ -125,13 +122,11 @@ class TutorialViewProvider {
                 webviewView.webview.postMessage({ command: 'load_step_return', step: step, state: state });
             } else if (message.command === 'mark_step_complete') {
                 let step = message.step;
-                console.log('marking complete: ', step);
                 this.markStepComplete(step);
                 let state = this.readCompletionState();
                 webviewView.webview.postMessage({ command: 'update_state', state: state });
             } else if (message.command === 'ready') {
                 let state = this.readCompletionState();
-                console.log('STATE', state);
                 webviewView.webview.postMessage({ command: 'update_state', state: state });
                 let firstStep = null;
                 let i = 0;

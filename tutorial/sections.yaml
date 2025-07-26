@@ -1,8 +1,10 @@
 sections:
 - heading: Die Tastatur
   steps:
-  - heading: Wichtige Tasten
+  - heading: Die wichtigsten Tasten
     key: press-keys
+  - heading: Akzenttasten
+    key: dead-keys
   - heading: Tastenkombinationen
     key: modifier-keys
 - heading: Navigieren im Dokument

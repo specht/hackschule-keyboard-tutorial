@@ -25,7 +25,6 @@ window.addEventListener('message', event => {
             break;
         case 'update_state':
             state = message.state;
-            console.log('RECEIVED STATE', state);
             updateToc();
             break;
         case 'click_step':
@@ -164,7 +163,6 @@ window.addEventListener('DOMContentLoaded', function () {
     let nr = 0;
     const tbody = document.querySelector("table.toc tbody");
     for (let section of sections.sections) {
-        console.log("Inserting section", section);
         nr += 1;
 
         tbody.insertAdjacentHTML("beforeend", `
