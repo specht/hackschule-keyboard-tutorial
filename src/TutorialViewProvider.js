@@ -28,9 +28,11 @@ class TutorialViewProvider {
             console.log(`Message from webview: ${JSON.stringify(message)}`);
             if (message.command === 'load_step') {
                 console.log(`Loading step: ${message.key}`)
+                let step = {};
                 let yamlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.yaml`).fsPath;
-                const file = fs.readFileSync(yamlPath, 'utf8');
-                let step = yaml.parse(file) ?? {};
+                if (fs.existsSync(yamlPath)) {
+                    step = yaml.parse(fs.readFileSync(yamlPath, 'utf8')) ?? {};
+                }
                 let htmlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.html`).fsPath;
                 if (fs.existsSync(htmlPath)) {
                     step.instruction = fs.readFileSync(htmlPath, 'utf8');
@@ -74,7 +76,7 @@ class TutorialViewProvider {
     }
 
     getHtmlForWebview(webview) {
-        const htmlPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'webview.html').fsPath;
+        const htmlPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'index.html').fsPath;
         return fs.readFileSync(htmlPath, 'utf8');
     }
 }

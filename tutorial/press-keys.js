@@ -1,10 +1,9 @@
 const instruction = document.querySelector('#instruction');
 
 const entries = [
-    // Buchstaben
+    [`Beginnen wir mit den Buchstaben und Ziffern:`],
     [`A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z`, "Buchstaben", "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"],
     [`Ä,Ö,Ü,ß`, "Umlaute", "Ä,Ö,Ü,ß"],
-    // Ziffern
     [`1,2,3,4,5,6,7,8,9,0`, "Ziffern", "1,2,3,4,5,6,7,8,9,0"],
     [`Für manche Zeichen musst du die Shift-Taste gedrückt halten:`],
     [`.,_comma_,:,;,!,?,_quote_,'`, `Satzzeichen`, `.,_comma_,:,;,!,?,_quote_,'`],
@@ -46,7 +45,9 @@ for (let entry of entries) {
         div.insertAdjacentHTML('beforeend', `
             <table style="width: 100%;">
             <tr>
-            <td style='width: 1.2em;'><span class='circle'><svg class="icon"><use href="#circle-dotted"></use></svg></span></td>
+            <td style='width: 1.2em;'>
+            ${checkBox()}
+            </td>
             <td>${entry[1]}</td>
             <td class='wrap' style='text-align: right;'>${entry[0].split(',').map((x, _) => `<key data-key="${entry[2].split(',')[_].toLowerCase()}">${tr[x] ?? x}</key>`).join('')}</td>
             </tr>
@@ -66,6 +67,7 @@ catcher.addEventListener('beforeinput', function (e) {
     e.stopPropagation();
     e.stopImmediatePropagation();
 });
+
 catcher.addEventListener('keydown', function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -76,7 +78,6 @@ catcher.addEventListener('keydown', function (e) {
     if (key === '"') key = '_quote_';
     if (key === '\\') key = '_backslash_';
     let element = instruction.querySelector(`key[data-key="${key.toLowerCase()}"]`);
-    console.log('key', key, 'element', element);
     if (element) {
         element.classList.add('solved');
         if (element.classList.contains('active')) {
@@ -107,11 +108,11 @@ function updateSolved() {
             }
         }
         if (gotAll) {
-            table.querySelector('td').innerHTML = `<span class='circle success'><svg class="icon"><use href="#check"></use></svg></span>`;
+            table.querySelector('td .check').classList.add('checked');
         } else {
-            table.querySelector('td').innerHTML = `<span class='circle'><svg class="icon"><use href="#circle-dotted"></use></svg></span>`;
+            table.querySelector('td .check').classList.remove('checked');
             finished = false;
         }
-        document.querySelector('#bu_next').disabled = !finished;
+        if (finished) markTaskComplete();
     }
 }

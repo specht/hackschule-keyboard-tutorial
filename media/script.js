@@ -33,6 +33,12 @@ function updateToc() {
     document.querySelector(`tr[data-type="step"][data-step-index="${stepIndex}"]`).classList.add('active');
 }
 
+function markTaskComplete() {
+    if (stepIndex < stepOrder.length - 1) {
+        document.querySelector('#bu_next').disabled = false;
+    }
+}
+
 function clickStep(n) {
     stepIndex = n;
     updateToc();
@@ -59,11 +65,7 @@ window.addEventListener('DOMContentLoaded', function () {
         <tr data-type='section' data-section-index='${nr - 1}'>
             <td>${nr}.</td>
             <td colspan="2">${section.heading}</td>
-            <td>
-                <span class="circle">
-                    <svg class="icon"><use href="#circle-dotted"></use></svg>
-                </span>
-            </td>
+            <td>${checkBox()}</td>
         </tr>
         `);
         firstStepForSection.push(null);
@@ -78,11 +80,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 <td></td>
                 <td style="width: 0.5em;">&ndash;</td>
                 <td>${step.heading}</td>
-                <td>
-                    <span class="circle">
-                        <svg class="icon"><use href="#circle-dotted"></use></svg>
-                    </span>
-                </td>
+                <td>${checkBox()}</td>
             </tr>
             `);
 
@@ -100,3 +98,7 @@ window.addEventListener('DOMContentLoaded', function () {
     });
     clickStep(0);
 });
+
+function checkBox(id) {
+    return `<span id='${id}' class='check'><svg class="icon"><use href="#circle-dotted"></use></svg><svg class="icon"><use href="#check"></use></svg></span>`;
+}

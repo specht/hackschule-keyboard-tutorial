@@ -1,16 +1,10 @@
 sections:
-- heading: Wichtige Tasten
+- heading: Die Tastatur
   steps:
   - heading: Wichtige Tasten
     key: press-keys
   - heading: Tastenkombinationen
     key: modifier-keys
-  - heading: Sonderzeichen
-    key: special-characters
-  - heading: Text löschen
-    key: delete-text
-  - heading: Text formatieren
-    key: format-text
 - heading: Navigieren im Dokument
   steps:
   - heading: Springen
@@ -18,7 +12,11 @@ sections:
 - heading: Text markieren
   steps: []
 - heading: Text bearbeiten
-  steps: []
+  steps:
+  - heading: Text löschen
+    key: delete-text
+  - heading: Text einrücken
+    key: indent-text
 - heading: Ansicht
   steps: []
 - heading: Suchen und Ersetzen
