@@ -71,16 +71,23 @@ class TutorialViewProvider {
                 console.log(`Loading step: ${message.key}`)
                 let step = {};
                 let yamlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.yaml`).fsPath;
-                if (fs.existsSync(yamlPath)) {
-                    step = yaml.parse(fs.readFileSync(yamlPath, 'utf8')) ?? {};
-                }
                 let htmlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.html`).fsPath;
                 if (fs.existsSync(htmlPath)) {
-                    step.instruction = fs.readFileSync(htmlPath, 'utf8');
-                }
-                let scriptPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.js`).fsPath;
-                if (fs.existsSync(scriptPath)) {
-                    step.script = fs.readFileSync(scriptPath, 'utf8');
+                    let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+
+                    const yamlMatch = htmlContent.match(/<yaml>([\s\S]*?)<\/yaml>/i);
+                    if (yamlMatch) {
+                        step = yaml.parse(yamlMatch[1].trim()) ?? {};
+                        htmlContent = htmlContent.replace(yamlMatch[0], "");
+                    }
+
+                    const scriptMatch = htmlContent.match(/<script>([\s\S]*?)<\/script>/i);
+                    if (scriptMatch) {
+                        step.script = scriptMatch[1].trim(); // just the JS code inside
+                        htmlContent = htmlContent.replace(scriptMatch[0], "");
+                    }
+
+                    step.instruction = htmlContent.trim();
                 }
                 if (step.file) {
                     let filePath = vscode.Uri.joinPath(this.context.extensionUri, step.file).fsPath;

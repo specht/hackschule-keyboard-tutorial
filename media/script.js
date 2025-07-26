@@ -87,6 +87,17 @@ function updateToc() {
     }
 }
 
+function checkTaskSolved() {
+    let solved = true;
+    for (let el of document.querySelectorAll('#instruction .check')) {
+        if (!el.classList.contains('checked')) {
+            solved = false;
+            break;
+        }
+    }
+    if (solved) markTaskComplete();
+}
+
 function markTaskComplete() {
     if (markedAsComplete) return;
 

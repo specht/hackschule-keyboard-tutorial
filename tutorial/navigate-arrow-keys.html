@@ -1,3 +1,8 @@
+<yaml>
+file: tutorial/alice.txt
+cursor: [16, 33]
+</yaml>
+
 <h2>Navigieren mit Pfeiltasten</h2>
 <p>
     Jetzt, wo du weißt, wo welche Tasten sind, können wir uns der
@@ -13,11 +18,30 @@
     werden automatisch hervorgehoben.
 </div>
 
-<p>
-    Bewege den Cursor nur mit Hilfe der Pfeiltasten 
-    <key><svg class="icon"><use href="#arrow-left"></use></svg></key>
-    <key><svg class="icon"><use href="#arrow-right"></use></svg></key>
-    <key><svg class="icon"><use href="#arrow-up"></use></svg></key>
-    <key><svg class="icon"><use href="#arrow-down"></use></svg></key>
-    <strong>auf den Anfang</strong> des Wortes »pictures« in Zeile 19.
-</p>
+<table id="table"></table>
+
+<script>
+handleOnDidChangeTextEditorSelection = function(e) {
+    let s = e.selections[0];
+    if (s.start.line === 18 && s.start.character === 23 &&
+        s.end.line === s.start.line && s.end.character === s.start.character) {
+        document.querySelector('#s0 .check').classList.add('checked');
+        checkTaskSolved();
+    }
+}
+
+let table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <td style='width: 1.2em;' id="s0">
+        ${checkBox()}
+    </td><td>
+        Bewege den Cursor nur mit Hilfe der Pfeiltasten
+        <key><svg class="icon"><use href="#arrow-left"></use></svg></key>
+        <key><svg class="icon"><use href="#arrow-right"></use></svg></key>
+        <key><svg class="icon"><use href="#arrow-up"></use></svg></key>
+        <key><svg class="icon"><use href="#arrow-down"></use></svg></key>
+        <strong>auf den Anfang</strong> des Wortes »pictures« in Zeile 19.
+    </td></tr>
+`);
+</script>

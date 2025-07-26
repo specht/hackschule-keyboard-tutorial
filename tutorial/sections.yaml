@@ -13,23 +13,23 @@ sections:
     key: navigate-page-keys
   - heading: Zum Anfang / zum Ende des Dokuments springen
     key: navigate-start-end
-- heading: Text markieren
-  steps: []
-- heading: Text bearbeiten
-  steps:
-  - heading: Text löschen
-    key: delete-text
-  - heading: Text einrücken
-    key: indent-text
-- heading: Ansicht
-  steps: []
-- heading: Suchen und Ersetzen
-  steps: []
-- heading: Multi-Cursor
-  steps: []
-- heading: Dateien und Verzeichnisse
-  steps: []
-- heading: Profi-Tricks
-  steps: []
-- heading: Command Palette
-  steps: []
+# - heading: Text markieren
+#   steps: []
+# - heading: Text bearbeiten
+#   steps:
+#   - heading: Text löschen
+#     key: delete-text
+#   - heading: Text einrücken
+#     key: indent-text
+# - heading: Ansicht
+#   steps: []
+# - heading: Suchen und Ersetzen
+#   steps: []
+# - heading: Multi-Cursor
+#   steps: []
+# - heading: Dateien und Verzeichnisse
+#   steps: []
+# - heading: Profi-Tricks
+#   steps: []
+# - heading: Command Palette
+#   steps: []
