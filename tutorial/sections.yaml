@@ -11,8 +11,12 @@ sections:
     key: navigate-arrow-keys
   - heading: Seitenweise blättern
     key: navigate-page-keys
-  - heading: Zum Anfang / zum Ende des Dokuments springen
+  - heading: Zum Anfang / zum Ende der Datei springen
     key: navigate-start-end
+  - heading: Zu einer bestimmten Zeile springen
+    key: navigate-goto-line
+  - heading: Bildausschnitt verschieben
+    key: navigate-move-region
 # - heading: Text markieren
 #   steps: []
 # - heading: Text bearbeiten

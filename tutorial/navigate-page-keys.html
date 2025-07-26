@@ -27,8 +27,10 @@ handleOnDidChangeTextEditorSelection = function(e) {
     if (s.start.line >= 1326 && s.start.line <= 1328 &&
         s.end.line === s.start.line && s.end.character === s.start.character) {
         document.querySelector('#s0 .check').classList.add('checked');
-        checkTaskSolved();
+    } else {
+        document.querySelector('#s0 .check').classList.remove('checked');
     }
+    checkTaskSolved();
 }
 
 let table = document.querySelector('#table');

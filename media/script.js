@@ -1,7 +1,7 @@
 const vscode = acquireVsCodeApi();
 let state = {};
 
-function nop(e) { console.log(e); }
+function nop(e) { }
 
 let handleOnDidChangeTextDocument = nop;
 let handleOnDidSaveTextDocument = nop;
@@ -95,7 +95,11 @@ function checkTaskSolved() {
             break;
         }
     }
-    if (solved) markTaskComplete();
+    if (solved) {
+        markTaskComplete();
+    } else {
+        markTaskIncomplete();
+    }
 }
 
 function markTaskComplete() {
@@ -106,10 +110,19 @@ function markTaskComplete() {
         step: stepOrder[stepIndex],
     });
 
-    if (stepIndex < stepOrder.length - 1) {
-        document.querySelector('#bu_next').disabled = false;
-    }
+    let button = document.querySelector('#bu_next');
+    button.disabled = false;
+    button.classList.remove('pop');
+    void button.offsetWidth;
+    button.classList.add('pop');
     markedAsComplete = true;
+}
+
+function markTaskIncomplete() {
+    if (!markedAsComplete) return;
+
+    document.querySelector('#bu_next').disabled = true;
+    markedAsComplete = false;
 }
 
 function clickStep(n) {
@@ -132,8 +145,14 @@ function clickStep(n) {
 
 function clickNextStep() {
     stepIndex = parseInt(`${stepIndex}`);
+    let oldStepIndex = stepIndex;
     stepIndex = (stepIndex + 1) % stepOrder.length;
-    clickStep(stepIndex);
+    while (stepIndex != oldStepIndex) {
+        if (!status[stepOrder[stepIndex]]) break;
+        stepIndex = (stepIndex + 1) % stepOrder.length;
+    }
+    if (oldStepIndex !== stepIndex)
+        clickStep(stepIndex);
 }
 
 function clickSection(n) {

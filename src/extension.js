@@ -44,6 +44,7 @@ async function activate(context) {
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider("typingSteps", provider)
     );
+    // vscode.commands.executeCommand('workbench.action.closePanel');
 
     console.log("Extension activated");
 

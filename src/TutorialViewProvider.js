@@ -104,8 +104,8 @@ class TutorialViewProvider {
                         const editor = vscode.window.activeTextEditor;
                         if (editor) {
                             const position = new vscode.Position(step.cursor[0] - 1, step.cursor[1] - 1);
-                            editor.selection = new vscode.Selection(position, position);
-                            await editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                            editor.selection = await new vscode.Selection(position, position);
+                            await editor.revealRange(new vscode.Range(position, position), step.cursor[2] === 'top' ? vscode.TextEditorRevealType.AtTop : vscode.TextEditorRevealType.InCenter);
                         }
                     }
                     if (step.scrollY) {

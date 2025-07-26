@@ -20,12 +20,28 @@ cursor: [16, 33]
 
 <table id="table"></table>
 
+<h3>Von Wort zu Wort springen</h3>
+<p>
+    Mit den Shortcuts
+    <key>Strg</key>+<key><svg class="icon"><use href="#arrow-left"></use></svg></key>
+    und
+    <key>Strg</key>+<key><svg class="icon"><use href="#arrow-right"></use></svg></key>
+    kannst du von Wort zu Wort springen.
+</p>
+
+<table id="table1"></table>
+
 <script>
 handleOnDidChangeTextEditorSelection = function(e) {
     let s = e.selections[0];
     if (s.start.line === 18 && s.start.character === 23 &&
         s.end.line === s.start.line && s.end.character === s.start.character) {
         document.querySelector('#s0 .check').classList.add('checked');
+        checkTaskSolved();
+    }
+    if (s.start.line === 22 && s.start.character === 25 &&
+        s.end.line === s.start.line && s.end.character === s.start.character) {
+        document.querySelector('#s1 .check').classList.add('checked');
         checkTaskSolved();
     }
 }
@@ -42,6 +58,20 @@ table.insertAdjacentHTML('beforeend', `
         <key><svg class="icon"><use href="#arrow-up"></use></svg></key>
         <key><svg class="icon"><use href="#arrow-down"></use></svg></key>
         <strong>auf den Anfang</strong> des Wortes »pictures« in Zeile 19.
+    </td></tr>
+`);
+
+table = document.querySelector('#table1');
+
+table.insertAdjacentHTML('beforeend', `
+    <td style='width: 1.2em;' id="s1">
+        ${checkBox()}
+    </td><td>
+        Nutze
+        <key>Strg</key>+<key><svg class="icon"><use href="#arrow-left"></use></svg></key>
+        und
+        <key>Strg</key>+<key><svg class="icon"><use href="#arrow-right"></use></svg></key>,
+        um den Cursor auf den Anfang des Wortes »daisy-chain« in Zeile 23 zu platzieren.
     </td></tr>
 `);
 </script>
