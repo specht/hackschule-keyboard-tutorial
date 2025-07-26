@@ -1,0 +1,33 @@
+sections:
+- heading: Wichtige Tasten
+  steps:
+  - heading: Wichtige Tasten
+    key: press-keys
+  - heading: Tastenkombinationen
+    key: modifier-keys
+  - heading: Sonderzeichen
+    key: special-characters
+  - heading: Text löschen
+    key: delete-text
+  - heading: Text formatieren
+    key: format-text
+- heading: Navigieren im Dokument
+  steps:
+  - heading: Springen
+    key: jump
+- heading: Text markieren
+  steps: []
+- heading: Text bearbeiten
+  steps: []
+- heading: Ansicht
+  steps: []
+- heading: Suchen und Ersetzen
+  steps: []
+- heading: Multi-Cursor
+  steps: []
+- heading: Dateien und Verzeichnisse
+  steps: []
+- heading: Profi-Tricks
+  steps: []
+- heading: Command Palette
+  steps: []
