@@ -3,20 +3,35 @@ const path = require("path");
 const fs = require("fs/promises");
 const os = require("os");
 const yaml = require("yaml");
+let provider = null;
 
 const TutorialViewProvider = require("./TutorialViewProvider");
 
 function watchUserActivity(context) {
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument((event) => {
-            console.log("User edited the text:", event.contentChanges);
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextDocument', event: event });
+        }),
+
+        vscode.workspace.onDidSaveTextDocument((event) => {
+            provider.webviewView.webview.postMessage({ command: 'onDidSaveTextDocument', event: event });
         }),
 
         vscode.window.onDidChangeTextEditorSelection((event) => {
-            const pos = event.selections[0].active;
-            console.log(`Cursor moved to line ${pos.line}, char ${pos.character}`);
-        })
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextEditorSelection', event: event });
+        }),
 
+        vscode.window.onDidChangeActiveTextEditor((event) => {
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeActiveTextEditor', event: event });
+        }),
+
+        vscode.window.onDidChangeTextEditorOptions((event) => {
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextEditorOptions', event: event });
+        }),
+
+        vscode.window.onDidChangeTextEditorVisibleRanges((event) => {
+            provider.webviewView.webview.postMessage({ command: 'onDidChangeTextEditorVisibleRanges', event: event });
+        }),
     );
 }
 
@@ -24,7 +39,7 @@ async function activate(context) {
     // return;
     const file = await fs.readFile(vscode.Uri.joinPath(context.extensionUri, "tutorial", "sections.yaml").fsPath, 'utf8');
     const sections = yaml.parse(file);
-    const provider = new TutorialViewProvider(context, sections);
+    provider = new TutorialViewProvider(context, sections);
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider("typingSteps", provider)
@@ -37,11 +52,11 @@ async function activate(context) {
     // focusSideBar
     // focusPanel
 
-// const editor = vscode.window.activeTextEditor;
-// if (editor && editor.document.isUntitled) {
-//   // Revert the document silently
-//   await vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor");
-// }    
+    // const editor = vscode.window.activeTextEditor;
+    // if (editor && editor.document.isUntitled) {
+    //   // Revert the document silently
+    //   await vscode.commands.executeCommand("workbench.action.revertAndCloseActiveEditor");
+    // }    
 
     // for (const group of vscode.window.tabGroups.all) {
     //     console.log('Group', group);

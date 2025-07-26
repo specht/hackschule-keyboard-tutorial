@@ -5,12 +5,16 @@ const entries = [
     [`A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z`, "Buchstaben", "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z"],
     [`Ä,Ö,Ü,ß`, "Umlaute", "Ä,Ö,Ü,ß"],
     [`1,2,3,4,5,6,7,8,9,0`, "Ziffern", "1,2,3,4,5,6,7,8,9,0"],
-    [`Für manche Zeichen musst du die Shift-Taste gedrückt halten:`],
+    [`<strong>Modifikator-Tasten:</strong> Diese Tasten produzieren allein keine Zeichen, aber sie können die Bedeutung der anderen Tasten verändern.`],
+    [`Strg`, "Steuerung", "Control"],
+    [`Shift`, "Shift (Umschalt)", "Shift"],
+    [`Alt`, "Alt", "Alt"],
+    [`Für manche Zeichen musst du die <strong>Shift-Taste</strong> gedrückt halten:`],
     [`.,_comma_,:,;,!,?,_quote_,'`, `Satzzeichen`, `.,_comma_,:,;,!,?,_quote_,'`],
     [`+,-,*,/,=,%`, `Rechenzeichen`, `+,-,*,/,=,%`],
-    [`Für manche Zeichen musst du die AltGr-Taste gedrückt halten:`],
+    [`Für manche Zeichen musst du die <strong>AltGr-Taste</strong> gedrückt halten:`],
     [`(,),[,],{,},<,>`, "Klammern", "(,),[,],{,},<,>"],
-    ["@,#,&,_backslash_,~,€,_", "Sonderzeichen", "@,#,&,_backslash_,~,€,_"],
+    ["@,#,&,_backslash_,~,€,_,|", "Sonderzeichen", "@,#,&,_backslash_,~,€,_,|"],
     [`<svg class="icon"><use href="#arrow-left"></use></svg>,<svg class="icon"><use href="#arrow-right"></use></svg>,<svg class="icon"><use href="#arrow-up"></use></svg>,<svg class="icon"><use href="#arrow-down"></use></svg>`, "Pfeiltasten", "ArrowLeft,ArrowRight,ArrowUp,ArrowDown"],
     [`Mit diesen Tasten kannst du schnell navigieren:`],
     [`Pos1,Ende,Bild <svg class="icon"><use href="#arrow-up"></use></svg>,Bild <svg class="icon"><use href="#arrow-down"></use></svg>`, 'Navigationstasten', `Home,End,PageUp,PageDown`],
@@ -26,12 +30,8 @@ const entries = [
     [`Mit <strong>Enter</strong> kannst du nicht nur Zeilenumbrüche einfügen, sondern auch Dialoge bestätigen (und mit <key>Esc</key> abbrechen):`],
     [`<svg class="icon"><use href="#corner-down-left"></use></svg>`, "Enter", "Enter"],
     [`Esc`, "Escape", "Escape"],
-    [`Die größte Taste haben wir uns bis fast zum Schluss aufgehoben:`],
+    [`Die größte Taste haben wir uns bis zum Schluss aufgehoben:`],
     [`&nbsp;&nbsp;<svg class="icon"><use href="#space"></use></svg>&nbsp;&nbsp;`, "Leertaste", " "],
-    [`<strong>Modifikator-Tasten:</strong> Diese Tasten produzieren allein keine Zeichen, aber sie können die Bedeutung der anderen Tasten verändern.`],
-    [`Strg`, "Steuerung", "Control"],
-    [`Shift`, "Shift (Umschalt)", "Shift"],
-    [`Alt`, "Alt", "Alt"],
 ];
 
 let div = instruction.querySelector('#keys_here');
@@ -72,6 +72,7 @@ catcher.addEventListener('keydown', function (e) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
+    if (e.repeat) return;
     instruction.querySelector('#key_catcher').value = "";
     let key = e.key;
     if (key === ',') key = '_comma_';

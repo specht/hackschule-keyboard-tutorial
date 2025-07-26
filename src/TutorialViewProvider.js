@@ -4,10 +4,49 @@ const yaml = require("yaml");
 const os = require("os");
 const path = require("path");
 
+const tutorialDir = path.join(os.homedir(), ".hs-kbd-tutorial");
+
 class TutorialViewProvider {
     constructor(context, sections) {
         this.context = context;
         this.sections = sections;
+    }
+
+    readCompletionState() {
+        let state = {};
+        for (let section of this.sections.sections) {
+            for (let step of section.steps) {
+                let key = step.key;
+                state[key] = false;
+            }
+        }
+        fs.mkdirSync(tutorialDir, {recursive: true});
+        const stateFilePath = path.join(tutorialDir, '.state.json');
+        if (fs.existsSync(stateFilePath)) {
+            try {
+                let data = JSON.parse(fs.readFileSync(stateFilePath));
+                for (let key in data) {
+                    if (key in state) {
+                        state[key] = data[key];
+                    }
+                }
+            } catch {
+            }
+        }
+        // fs.writeFileSync(stateFilePath, JSON.stringify(state), "utf8");
+        return state;
+    }
+
+    writeCompletionState(state) {
+        fs.mkdirSync(tutorialDir, {recursive: true});
+        const stateFilePath = path.join(tutorialDir, '.state.json');
+        fs.writeFileSync(stateFilePath, JSON.stringify(state), "utf8");
+    }
+
+    markStepComplete(step) {
+        let state = this.readCompletionState();
+        state[step] = true;
+        this.writeCompletionState(state);
     }
 
     resolveWebviewView(webviewView, context, token) {
@@ -18,7 +57,9 @@ class TutorialViewProvider {
             localResourceRoots: [this.context.extensionUri],
         };
 
-        let html = this.getHtmlForWebview(webviewView.webview);
+        const htmlPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'index.html').fsPath;
+        let html = fs.readFileSync(htmlPath, 'utf8');
+
         html = html.replace('styles.css', webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'styles.css')));
         html = html.replace('script.js', webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'script.js')));
         html = html.replace('"__SECTIONS__"', JSON.stringify(this.sections));
@@ -47,19 +88,25 @@ class TutorialViewProvider {
                     let contents = fs.readFileSync(filePath, 'utf8');
                     let baseName = path.basename(filePath);
                     console.log('baseName', baseName);
-                    let dir = path.join(os.homedir(), ".hs-kbd-tutorial");
-                    fs.mkdirSync(dir, {recursive: true});
-                    const tempFilePath = path.join(dir, baseName);
+                    fs.mkdirSync(tutorialDir, {recursive: true});
+                    const tempFilePath = path.join(tutorialDir, baseName);
                     fs.writeFileSync(tempFilePath, contents, "utf8");
-                    // const doc = vscode.workspace.openTextDocument(tempFilePath);
                     let doc = await vscode.workspace.openTextDocument(tempFilePath);
                     await vscode.window.showTextDocument(doc, { preview: false });
                     if (step.cursor) {
                         const editor = vscode.window.activeTextEditor;
                         if (editor) {
-                            const position = new vscode.Position(step.cursor[0] - 1, step.cursor[1]); // line 10, character 5 (0-based)
+                            const position = new vscode.Position(step.cursor[0] - 1, step.cursor[1] - 1);
                             editor.selection = new vscode.Selection(position, position);
-                            editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                            await editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                        }
+                    }
+                    if (step.scrollY) {
+                        const editor = vscode.window.activeTextEditor;
+                        if (editor) {
+                            const position = new vscode.Position(step.scrollY - 1, 0);
+                            console.log('scrolling!!!', position)
+                            await editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.AtTop);
                         }
                     }
                     // await vscode.workspace.getConfiguration("editor", doc.uri).update(
@@ -67,17 +114,35 @@ class TutorialViewProvider {
                     // );
 
                 }
-                webviewView.webview.postMessage({ command: 'load_step_return', step: step });
+                let state = this.readCompletionState();
+                webviewView.webview.postMessage({ command: 'load_step_return', step: step, state: state });
+            } else if (message.command === 'mark_step_complete') {
+                let step = message.step;
+                console.log('marking complete: ', step);
+                this.markStepComplete(step);
+                let state = this.readCompletionState();
+                webviewView.webview.postMessage({ command: 'update_state', state: state });
+            } else if (message.command === 'ready') {
+                let state = this.readCompletionState();
+                console.log('STATE', state);
+                webviewView.webview.postMessage({ command: 'update_state', state: state });
+                let firstStep = null;
+                let i = 0;
+                for (let section of this.sections.sections) {
+                    for (let step of section.steps) {
+                        let key = step.key;
+                        if (!state[key]) {
+                            firstStep = i;
+                            break;
+                        }
+                        i += 1;
+                    }
+                    if (firstStep !== null) break;
+                }
+                if (firstStep === null) firstStep = 0;
+                webviewView.webview.postMessage({ command: 'click_step', step: firstStep });
             }
         });
-
-        webviewView.webview.postMessage({ command: 'setTitle', text: 'Welcome!' });
-
-    }
-
-    getHtmlForWebview(webview) {
-        const htmlPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'index.html').fsPath;
-        return fs.readFileSync(htmlPath, 'utf8');
     }
 }
 

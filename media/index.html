@@ -9,7 +9,7 @@
             const stepOrder = [];
             const stepSection = [];
             const firstStepForSection = [];
-            let stepIndex = null;
+            let stepIndex = 0;
         </script>
         <script type="text/javascript" src="script.js"></script>
     </head>
@@ -85,30 +85,14 @@
         <hr>
         <table class="toc">
             <tbody></tbody>
-            <!-- <tr><td>1.</td><td colspan="2">Wichtige Tasten</td><td><span class='circle'><svg class="icon"><use href="#circle-dotted"></use></svg></span></td></tr>
-            <tr class="active"><td></td><td style="width: 0.5em;">&ndash;</td><td>Pfeiltasten</td><td><span class='circle success'><svg class="icon"><use href="#check"></use></svg></span></td></tr>
-            <tr><td></td><td style="width: 0.5em;">&ndash;</td><td>Sonderzeichen</td><td></td></tr>
-            <tr><td></td><td style="width: 0.5em;">&ndash;</td><td>Tabulator-Taste</td><td></td></tr>
-            <tr><td></td><td style="width: 0.5em;">&ndash;</td><td>Tasten zum Löschen</td><td></td></tr>
-            <tr><td></td><td style="width: 0.5em;">&ndash;</td><td>Enter und Escape</td><td></td></tr>
-            <tr><td></td><td style="width: 0.5em;">&ndash;</td><td>Tastenkombinationen</td><td></td></tr>
-            <tr><td>2.</td><td colspan="2">Navigieren im Dokument</td><td></td></tr>
-            <tr><td>3.</td><td colspan="2">Text markieren</td><td></td></tr>
-            <tr><td>4.</td><td colspan="2">Text bearbeiten</td><td></td></tr>
-            <tr><td>5.</td><td colspan="2">Ansicht</td><td></td></tr>
-            <tr><td>6.</td><td colspan="2">Suchen und Ersetzen</td><td></td></tr>
-            <tr><td>7.</td><td colspan="2">Multi-Cursor</td><td></td></tr>
-            <tr><td>8.</td><td colspan="2">Dateien und Verzeichnisse</td><td></td></tr>
-            <tr><td>9.</td><td colspan="2">Profi-Tricks</td><td></td></tr>
-            <tr><td>10.</td><td colspan="2">Command Palette</td><td></td></tr> -->
         </table>
         <hr>
         <div id="instruction"></div>
         <hr>
         <div style="display: flex; justify-content: space-between;">
             <button id="bu_reload" class="button secondary" onclick="clickStep(stepIndex)"><svg class="icon"><use
-                        href="#reload"></use></svg> Wiederholen</button>
-            <button id="bu_next" disabled class="button" onclick="clickStep((stepIndex + 1) % stepOrder.length)">Nächster Schritt <svg class="icon"><use
+                        href="#reload"></use></svg> <span>Neu starten</span></button>
+            <button id="bu_next" disabled class="button" onclick="clickNextStep()"><span>Nächster Schritt</span> <svg class="icon"><use
                         href="#chevrons-right"></use></svg></button>
         </div>
         <div style="margin-bottom: 1em;"></div>

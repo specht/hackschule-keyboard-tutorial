@@ -1,13 +1,17 @@
 const vscode = acquireVsCodeApi();
+let state = {};
+
+function nop(e) { console.log(e); }
+
+let handleOnDidChangeTextDocument = nop;
+let handleOnDidSaveTextDocument = nop;
+let handleOnDidChangeTextEditorSelection = nop;
+let handleOnDidChangeActiveTextEditor = nop;
+let handleOnDidChangeTextEditorOptions = nop;
+let handleOnDidChangeTextEditorVisibleRanges = nop;
+let markedAsComplete = false;
 
 // Send a message TO the Extension
-function sendMessage() {
-    vscode.postMessage({
-        command: 'log',
-        text: 'Hello from the webview!'
-    });
-}
-
 // Receive messages FROM the Extension
 window.addEventListener('message', event => {
     const message = event.data;
@@ -16,8 +20,36 @@ window.addEventListener('message', event => {
             document.querySelector('#instruction').innerHTML = message.step.instruction;
             eval(message.step.script ?? '');
             document.querySelector('#bu_next').disabled = true;
+            state = message.state;
+            updateToc();
             break;
-    }
+        case 'update_state':
+            state = message.state;
+            console.log('RECEIVED STATE', state);
+            updateToc();
+            break;
+        case 'click_step':
+            clickStep(message.step);
+            break;
+        case 'onDidChangeTextDocument':
+            handleOnDidChangeTextDocument(message.event);
+            break;
+        case 'onDidSaveTextDocument':
+            handleOnDidSaveTextDocument(message.event);
+            break;
+        case 'onDidChangeTextEditorSelection':
+            handleOnDidChangeTextEditorSelection(message.event);
+            break;
+        case 'onDidChangeActiveTextEditor':
+            handleOnDidChangeActiveTextEditor(message.event);
+            break;
+        case 'onDidChangeTextEditorOptions':
+            handleOnDidChangeTextEditorOptions(message.event);
+            break;
+        case 'onDidChangeTextEditorVisibleRanges':
+            handleOnDidChangeTextEditorVisibleRanges(message.event);
+            break;
+        }
 });
 
 function updateToc() {
@@ -31,22 +63,66 @@ function updateToc() {
     for (let el of document.querySelectorAll(`tr[data-type="step"][data-section-index="${stepSection[stepIndex]}"]`))
         el.style.display = '';
     document.querySelector(`tr[data-type="step"][data-step-index="${stepIndex}"]`).classList.add('active');
+
+    let sectionUnsolved = {};
+    let maxSection = 0;
+
+    for (let i = 0; i < stepOrder.length; i++) {
+        if (stepSection[i] > maxSection) maxSection = stepSection[i];
+        let check = document.querySelector(`tr[data-type="step"][data-step-key="${stepOrder[i]}"] .check`);
+        if (state[stepOrder[i]]) {
+            check.classList.add('checked');
+        } else {
+            check.classList.remove('checked');
+            sectionUnsolved[stepSection[i]] = true;
+        }
+    }
+    for (let i = 0; i <= maxSection; i++) {
+        let check = document.querySelector(`tr[data-type="section"][data-section-index="${i}"] .check`);
+        if (sectionUnsolved[i]) {
+            check.classList.remove('checked');
+        } else {
+            check.classList.add('checked');
+        }
+    }
 }
 
 function markTaskComplete() {
+    if (markedAsComplete) return;
+
+    vscode.postMessage({
+        command: 'mark_step_complete',
+        step: stepOrder[stepIndex],
+    });
+
     if (stepIndex < stepOrder.length - 1) {
         document.querySelector('#bu_next').disabled = false;
     }
+    markedAsComplete = true;
 }
 
 function clickStep(n) {
     stepIndex = n;
+    stepIndex = parseInt(`${stepIndex}`);
     updateToc();
+    handleOnDidChangeTextDocument = nop;
+    handleOnDidSaveTextDocument = nop;
+    handleOnDidChangeTextEditorSelection = nop;
+    handleOnDidChangeActiveTextEditor = nop;
+    handleOnDidChangeTextEditorOptions = nop;
+    handleOnDidChangeTextEditorVisibleRanges = nop;
+    markedAsComplete = false;
 
     vscode.postMessage({
         command: 'load_step',
         key: stepOrder[stepIndex],
     });
+}
+
+function clickNextStep() {
+    stepIndex = parseInt(`${stepIndex}`);
+    stepIndex = (stepIndex + 1) % stepOrder.length;
+    clickStep(stepIndex);
 }
 
 function clickSection(n) {
@@ -76,7 +152,7 @@ window.addEventListener('DOMContentLoaded', function () {
             stepOrder.push(step.key);
             stepSection.push(nr - 1);
             tbody.insertAdjacentHTML("beforeend", `
-            <tr data-type='step' data-step-index='${stepOrder.length - 1}' data-section-index='${nr - 1}'>
+            <tr data-type='step' data-step-index='${stepOrder.length - 1}' data-step-key='${step.key}' data-section-index='${nr - 1}'>
                 <td></td>
                 <td style="width: 0.5em;">&ndash;</td>
                 <td>${step.heading}</td>
@@ -96,7 +172,8 @@ window.addEventListener('DOMContentLoaded', function () {
             clickStep(row.dataset.stepIndex);
         }
     });
-    clickStep(0);
+    updateToc();
+    vscode.postMessage({ command: 'ready'});
 });
 
 function checkBox(id) {

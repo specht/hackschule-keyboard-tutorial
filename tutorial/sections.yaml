@@ -7,8 +7,12 @@ sections:
     key: modifier-keys
 - heading: Navigieren im Dokument
   steps:
-  - heading: Springen
-    key: jump
+  - heading: Navigieren mit Pfeiltasten
+    key: navigate-arrow-keys
+  - heading: Seitenweise blättern
+    key: navigate-page-keys
+  - heading: Zum Anfang / zum Ende des Dokuments springen
+    key: navigate-start-end
 - heading: Text markieren
   steps: []
 - heading: Text bearbeiten
