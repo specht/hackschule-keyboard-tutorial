@@ -74,6 +74,7 @@ class TutorialViewProvider {
                 let htmlPath = vscode.Uri.joinPath(this.context.extensionUri, "tutorial", `${message.key}.html`).fsPath;
                 if (fs.existsSync(htmlPath)) {
                     let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+                    htmlContent = htmlContent.replace('tutorial/keyboard.jpg', webviewView.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'tutorial', 'keyboard.jpg')));
 
                     const yamlMatch = htmlContent.match(/<yaml>([\s\S]*?)<\/yaml>/i);
                     if (yamlMatch) {
