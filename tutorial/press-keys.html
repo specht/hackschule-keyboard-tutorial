@@ -12,8 +12,6 @@
 
 <h2>Willkommen zum Keyboard-Tutorial!</h2>
 
-<img src="tutorial/keyboard.jpg" style="border: 1px solid #ddd;">
-
 <p>
     Hier lernst du  die wichtigsten Grundlagen, um schnell und
     effizient Texte am Computer bearbeiten zu können.
@@ -45,16 +43,17 @@ const entries = [
     [`Für manche Zeichen musst du die <strong>Shift-Taste</strong> gedrückt halten:`],
     [`.,_comma_,:,;,!,?,_quote_,'`, `Satzzeichen`, `.,_comma_,:,;,!,?,_quote_,'`],
     [`+,-,*,/,=,%`, `Rechenzeichen`, `+,-,*,/,=,%`],
-    [`Für manche Zeichen musst du die <strong>AltGr-Taste</strong> gedrückt halten:`],
-    [`(,),[,],{,},<,>`, "Klammern", "(,),[,],{,},<,>"],
-    ["@,#,&,_backslash_,~,€,_,|,°", "Sonderzeichen", "@,#,&,_backslash_,~,€,_,|,°"],
+    [`(,),<,>,#,&,_,°`, "Weitere Zeichen (teilweise mit Shift)", `(,),<,>,#,&,_,°`],
+    [`Für manche Zeichen musst du die <strong>AltGr-Taste</strong> gedrückt halten. Die genaue Belegung kann je nach Tastatur leicht abweichen:`],
+    [`[,],{,}`, "Eckige und geschweifte Klammern", `[,],{,}`],
+    ["@,_backslash_,~,€,|", "Sonderzeichen mit AltGr", "@,_backslash_,~,€,|"],
     [`<svg class="icon"><use href="#arrow-left"></use></svg>,<svg class="icon"><use href="#arrow-right"></use></svg>,<svg class="icon"><use href="#arrow-up"></use></svg>,<svg class="icon"><use href="#arrow-down"></use></svg>`, "Pfeiltasten", "ArrowLeft,ArrowRight,ArrowUp,ArrowDown"],
     [`Mit diesen Tasten kannst du schnell navigieren:`],
     [`Pos1,Ende,Bild <svg class="icon"><use href="#arrow-up"></use></svg>,Bild <svg class="icon"><use href="#arrow-down"></use></svg>`, 'Navigationstasten', `Home,End,PageUp,PageDown`],
     [`Zeichen links vom Cursor / rechts vom Cursor löschen:`],
     [`&nbsp;&nbsp;<svg class="icon"><use href="#arrow-left"></use></svg>,Entf`, `Backspace und Entf`, `Backspace,Delete`],
     [`<strong>Feststell-Tasten:</strong> die nächsten beiden Tasten sind besonders trickreich. Wenn du sie einmal drückst, sind sie »eingerastet«. Wenn du sie nochmal drückst, sind sie wieder inaktiv.`],
-    [`Wenn du die <strong>CapsLock-Taste</strong> (oder Feststell-Taste) drückst, ist es so, als würdest du die ganze Zeit Shift gedrückt halten. Es gibt auch eine kleine LED auf der Tastatur. Stelle sicher, dass du die CapsLock-Taste am Ende wieder deaktivierst.`],
+    [`Wenn du die <strong>CapsLock-Taste</strong> (oder Feststell-Taste) drückst, werden Buchstaben dauerhaft großgeschrieben. Anders als <key>Shift</key> verändert sie normalerweise nicht die Ziffern und Satzzeichen. Oft zeigt eine kleine LED an, ob CapsLock aktiv ist. Stelle sicher, dass du die Taste am Ende wieder deaktivierst.`],
     [`CapsLock`, `CapsLock`, `CapsLock`],
     [`Wenn du dich wunderst, wieso du deinen Text überschreibst, während du Tasten drückst, hast du vermutlich die <strong>Einfüge-Taste</strong> gedrückt. Wenn sie aktiv ist, wird der vorhandene Text einfach überschrieben. Hierfür gibt es keine LED, aber man erkennt es meistens an der Form des Cursors.`],
     [`Einfg`, `Einfügetaste`, `Insert`],
@@ -91,7 +90,7 @@ for (let entry of entries) {
 
 const catcher = document.querySelector('#key_catcher');
 
-document.addEventListener('click', function() {
+addStepEventListener(document, 'click', function() {
     catcher.focus({ preventScroll: true });
 });
 

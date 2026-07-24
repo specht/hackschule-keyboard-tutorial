@@ -1,0 +1,56 @@
+<yaml>
+workspace: tutorial/workspace/files-quick-open
+openFiles:
+  - start.txt
+activeFile: start.txt
+</yaml>
+
+<h2>Eine Datei schnell öffnen</h2>
+
+<p>
+    Mit <key>Strg</key> + <key>P</key> öffnest du die Dateisuche.
+    Tippe einen Teil des Dateinamens und bestätige den passenden Treffer
+    mit <key>Enter</key>.
+</p>
+
+<table id="table"></table>
+
+<script>
+let planOpened = false;
+
+handleOnDidChangeActiveTextEditor = function(e) {
+    const relativePath = e.resource && e.resource.relativePath;
+
+    if (!planOpened && relativePath === 'material/plan.txt') {
+        planOpened = true;
+        setCheckBox('s0', true);
+    }
+
+    if (planOpened && relativePath === 'material/karte.txt') {
+        setCheckBox('s1', true);
+    }
+
+    checkTaskSolved();
+};
+
+const table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s0')}</td>
+        <td>
+            Öffne mit <key>Strg</key> + <key>P</key> die Datei
+            <code>plan.txt</code>.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s1')}</td>
+        <td>
+            Öffne auf dieselbe Weise <code>karte.txt</code>.
+        </td>
+    </tr>
+`);
+</script>

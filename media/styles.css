@@ -10,8 +10,8 @@
     --my-toolbar-hoverBackground: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
     --my-toolbar-activeBackground: var(--vscode-toolbar-activeBackground, rgba(99, 102, 103, 0.31));
     --my-terminal-ansiGreen: var(--vscode-terminal-ansiGreen, #0dbc79);
-    --my-terminal-ansiYellow: var(--vscode-terminal-ansiGreen, #e5e510);
-    --my-terminal-ansiRed: var(--vscode-terminal-ansiGreen, #cd3131);
+    --my-terminal-ansiYellow: var(--vscode-terminal-ansiYellow, #e5e510);
+    --my-terminal-ansiRed: var(--vscode-terminal-ansiRed, #cd3131);
     --my-input-background: var(--vscode-input-background, #313131);
     --my-input-border: var(--vscode-input-border, #3c3c3c);
     --my-input-foreground: var(--vscode-input-foreground, #cccccc);
@@ -321,4 +321,12 @@ key {
             color: var(--my-terminal-ansiGreen);
         }
     }
+}
+.error {
+    margin: 1em 0;
+    padding: 0.75em;
+    border: 1px solid var(--my-terminal-ansiRed);
+    border-radius: 0.25em;
+    user-select: text;
+    white-space: pre-wrap;
 }

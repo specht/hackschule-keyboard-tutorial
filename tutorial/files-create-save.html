@@ -1,0 +1,65 @@
+<yaml>
+workspace: tutorial/workspace/files-create-save
+</yaml>
+
+<h2>Eine neue Datei anlegen</h2>
+
+<p>
+    Im Explorer legt das Symbol <strong>Neue Datei</strong> eine Datei im
+    ausgewählten Ordner an. Nach der Eingabe des Namens bestätigst du mit
+    <key>Enter</key>.
+</p>
+
+<table id="table"></table>
+
+<script>
+let fileCreated = false;
+const expected = 'Ich kann Dateien anlegen.';
+
+handleOnDidCreateFiles = function(e) {
+    if ((e.files || []).some(file =>
+        file.relativePath === 'meine-notiz.txt'
+    )) {
+        fileCreated = true;
+        setCheckBox('s0', true);
+    }
+
+    checkTaskSolved();
+};
+
+handleOnDidSaveTextDocument = function(e, contents) {
+    if (
+        fileCreated &&
+        e.document &&
+        e.document.isDirty === false &&
+        e.document.fileName.endsWith('meine-notiz.txt') &&
+        contents === expected
+    ) {
+        setCheckBox('s1', true);
+    }
+
+    checkTaskSolved();
+};
+
+const table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s0')}</td>
+        <td>
+            Lege im Ordner <code>files-create-save</code> die Datei
+            <code>meine-notiz.txt</code> an.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s1')}</td>
+        <td>
+            Schreibe <code>Ich kann Dateien anlegen.</code> hinein und
+            speichere die Datei mit <key>Strg</key> + <key>S</key>.
+        </td>
+    </tr>
+`);
+</script>

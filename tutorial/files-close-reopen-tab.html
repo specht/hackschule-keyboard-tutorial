@@ -1,0 +1,62 @@
+<yaml>
+workspace: tutorial/workspace/files-close-reopen-tab
+openFiles:
+  - notizen.txt
+  - aufgabe.txt
+activeFile: aufgabe.txt
+</yaml>
+
+<h2>Einen Tab schließen und wieder öffnen</h2>
+
+<p>
+    Unter Linux schließt <key>Strg</key> + <key>W</key> den aktiven Tab.
+    Mit <key>Strg</key> + <key>Shift</key> + <key>T</key> öffnest du den
+    zuletzt geschlossenen Editor wieder.
+</p>
+
+<table id="table"></table>
+
+<script>
+let taskTabClosed = false;
+
+function eventContains(tabs, relativePath) {
+    return (tabs || []).some(tab =>
+        tab.resource && tab.resource.relativePath === relativePath
+    );
+}
+
+handleOnDidChangeTabs = function(e) {
+    if (!taskTabClosed && eventContains(e.closed, 'aufgabe.txt')) {
+        taskTabClosed = true;
+        setCheckBox('s0', true);
+    }
+
+    if (taskTabClosed && eventContains(e.opened, 'aufgabe.txt')) {
+        setCheckBox('s1', true);
+    }
+
+    checkTaskSolved();
+};
+
+const table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s0')}</td>
+        <td>
+            Schließe den aktiven Tab <code>aufgabe.txt</code> mit
+            <key>Strg</key> + <key>W</key>.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s1')}</td>
+        <td>
+            Öffne ihn mit
+            <key>Strg</key> + <key>Shift</key> + <key>T</key> wieder.
+        </td>
+    </tr>
+`);
+</script>

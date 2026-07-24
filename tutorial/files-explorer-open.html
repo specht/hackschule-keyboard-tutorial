@@ -1,0 +1,60 @@
+<yaml>
+workspace: tutorial/workspace/files-explorer-open
+</yaml>
+
+<h2>Dateien im Explorer öffnen</h2>
+
+<p>
+    Der Explorer zeigt die Ordner und Dateien des geöffneten Projekts.
+    Mit <key>Strg</key> + <key>Shift</key> + <key>E</key> wechselst du
+    dorthin. Die Übungsdateien liegen unter
+    <code>Tastatur-Tutorial/files-explorer-open</code>.
+</p>
+
+<div class="hint">
+    <svg class="icon"><use href="#bulb"></use></svg>
+    Beim Wechsel zum Explorer verschwindet das Tutorial kurz aus der
+    Seitenleiste. Über das Hackschule-Symbol in der Aktivitätsleiste kommst
+    du wieder zurück.
+</div>
+
+<table id="table"></table>
+
+<script>
+let firstFileOpened = false;
+
+handleOnDidChangeActiveTextEditor = function(e) {
+    const relativePath = e.resource && e.resource.relativePath;
+
+    if (!firstFileOpened && relativePath === 'willkommen.txt') {
+        firstFileOpened = true;
+        setCheckBox('s0', true);
+    }
+
+    if (firstFileOpened && relativePath === 'hinweis.txt') {
+        setCheckBox('s1', true);
+    }
+
+    checkTaskSolved();
+};
+
+const table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s0')}</td>
+        <td>
+            Öffne im Explorer die Datei <code>willkommen.txt</code>.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s1')}</td>
+        <td>
+            Öffne danach <code>hinweis.txt</code>.
+        </td>
+    </tr>
+`);
+</script>

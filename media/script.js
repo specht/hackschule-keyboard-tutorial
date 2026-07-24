@@ -1,7 +1,12 @@
 const vscode = acquireVsCodeApi();
 let state = {};
+let currentStepKey = null;
+let currentStepPersistedComplete = false;
+let markedAsComplete = false;
+let stepCleanupCallbacks = [];
+let showingCompletion = false;
 
-function nop(e) { }
+function nop() { }
 
 let handleOnDidChangeTextDocument = nop;
 let handleOnDidSaveTextDocument = nop;
@@ -9,91 +14,206 @@ let handleOnDidChangeTextEditorSelection = nop;
 let handleOnDidChangeActiveTextEditor = nop;
 let handleOnDidChangeTextEditorOptions = nop;
 let handleOnDidChangeTextEditorVisibleRanges = nop;
-let markedAsComplete = false;
+let handleOnDidCreateFiles = nop;
+let handleOnDidRenameFiles = nop;
+let handleOnDidDeleteFiles = nop;
+let handleOnDidChangeTabs = nop;
 
-// Send a message TO the Extension
-// Receive messages FROM the Extension
-window.addEventListener('message', event => {
+function resetStepRuntime() {
+    for (const cleanup of stepCleanupCallbacks.splice(0)) {
+        try {
+            cleanup();
+        } catch (error) {
+            console.error("Tutorial cleanup failed", error);
+        }
+    }
+
+    handleOnDidChangeTextDocument = nop;
+    handleOnDidSaveTextDocument = nop;
+    handleOnDidChangeTextEditorSelection = nop;
+    handleOnDidChangeActiveTextEditor = nop;
+    handleOnDidChangeTextEditorOptions = nop;
+    handleOnDidChangeTextEditorVisibleRanges = nop;
+    handleOnDidCreateFiles = nop;
+    handleOnDidRenameFiles = nop;
+    handleOnDidDeleteFiles = nop;
+    handleOnDidChangeTabs = nop;
+}
+
+function onStepCleanup(callback) {
+    stepCleanupCallbacks.push(callback);
+}
+
+function addStepEventListener(target, type, listener, options) {
+    target.addEventListener(type, listener, options);
+    onStepCleanup(() => target.removeEventListener(type, listener, options));
+}
+
+function applySnapshot(snapshot) {
+    if (!snapshot) {
+        return;
+    }
+
+    const documentEvent = {
+        document: snapshot.document,
+        contentChanges: [],
+    };
+    handleOnDidChangeTextDocument(documentEvent, snapshot.contents);
+    handleOnDidChangeTextEditorSelection({
+        document: snapshot.document,
+        selections: snapshot.selections,
+    });
+    handleOnDidChangeActiveTextEditor({
+        document: snapshot.document,
+        selections: snapshot.selections,
+        visibleRanges: snapshot.visibleRanges,
+    });
+    handleOnDidChangeTextEditorVisibleRanges({
+        document: snapshot.document,
+        visibleRanges: snapshot.visibleRanges,
+    });
+}
+
+window.addEventListener("message", event => {
     const message = event.data;
     switch (message.command) {
-        case 'load_step_return':
-            document.querySelector('#instruction').innerHTML = message.step.instruction;
-            eval(message.step.script ?? '');
-            document.querySelector('#bu_next').disabled = true;
+        case "load_step_return": {
+            if (message.key !== currentStepKey) {
+                return;
+            }
+
             state = message.state;
+            currentStepPersistedComplete = state[currentStepKey] === true;
+            markedAsComplete = currentStepPersistedComplete;
+            document.querySelector("#instruction").innerHTML = message.step.instruction;
+
+            try {
+                // Tutorial files are bundled with the extension and act as small,
+                // deliberately flexible exercise plug-ins.
+                eval(message.step.script ?? "");
+                applySnapshot(message.snapshot);
+            } catch (error) {
+                console.error(error);
+                showError(`Der Tutorial-Schritt konnte nicht geladen werden: ${error.message}`);
+            }
+
+            const nextButton = document.querySelector("#bu_next");
+            nextButton.disabled = !currentStepPersistedComplete;
             updateToc();
-            break;
-        case 'update_state':
-            state = message.state;
-            updateToc();
-            break;
-        case 'click_step':
-            clickStep(message.step);
-            break;
-        case 'onDidChangeTextDocument':
-            handleOnDidChangeTextDocument(message.event, message.contents);
-            break;
-        case 'onDidSaveTextDocument':
-            handleOnDidSaveTextDocument(message.event);
-            break;
-        case 'onDidChangeTextEditorSelection':
-            handleOnDidChangeTextEditorSelection(message.event);
-            break;
-        case 'onDidChangeActiveTextEditor':
-            handleOnDidChangeActiveTextEditor(message.event);
-            break;
-        case 'onDidChangeTextEditorOptions':
-            handleOnDidChangeTextEditorOptions(message.event);
-            break;
-        case 'onDidChangeTextEditorVisibleRanges':
-            handleOnDidChangeTextEditorVisibleRanges(message.event);
             break;
         }
+        case "update_state":
+            state = message.state;
+            currentStepPersistedComplete = currentStepKey !== null && state[currentStepKey] === true;
+            if (currentStepPersistedComplete && !showingCompletion) {
+                document.querySelector("#bu_next").disabled = false;
+                markedAsComplete = true;
+            }
+            updateToc();
+            break;
+        case "click_step":
+            clickStep(message.step);
+            break;
+        case "show_error":
+            showError(message.message);
+            break;
+        case "onDidChangeTextDocument":
+            handleOnDidChangeTextDocument(message.event, message.contents);
+            break;
+        case "onDidSaveTextDocument":
+            handleOnDidSaveTextDocument(message.event, message.contents);
+            break;
+        case "onDidChangeTextEditorSelection":
+            handleOnDidChangeTextEditorSelection(message.event);
+            break;
+        case "onDidChangeActiveTextEditor":
+            handleOnDidChangeActiveTextEditor(message.event);
+            break;
+        case "onDidChangeTextEditorOptions":
+            handleOnDidChangeTextEditorOptions(message.event);
+            break;
+        case "onDidChangeTextEditorVisibleRanges":
+            handleOnDidChangeTextEditorVisibleRanges(message.event);
+            break;
+        case "onDidCreateFiles":
+            handleOnDidCreateFiles(message.event);
+            break;
+        case "onDidRenameFiles":
+            handleOnDidRenameFiles(message.event);
+            break;
+        case "onDidDeleteFiles":
+            handleOnDidDeleteFiles(message.event);
+            break;
+        case "onDidChangeTabs":
+            handleOnDidChangeTabs(message.event);
+            break;
+    }
 });
 
+function showError(message) {
+    document.querySelector("#instruction").innerHTML = `
+        <h2>Da ist etwas schiefgegangen</h2>
+        <div class="error">${escapeHtml(message)}</div>
+    `;
+    document.querySelector("#bu_next").disabled = true;
+}
+
+function escapeHtml(text) {
+    const element = document.createElement("div");
+    element.textContent = text;
+    return element.innerHTML;
+}
+
 function updateToc() {
-    for (let el of document.querySelectorAll('tr[data-type="section"]'))
-        el.classList.remove('active');
-    for (let el of document.querySelectorAll('tr[data-type="step"]'))
-        el.classList.remove('active');
+    for (const element of document.querySelectorAll('tr[data-type="section"], tr[data-type="step"]')) {
+        element.classList.remove("active");
+    }
 
-    for (let el of document.querySelectorAll('tr[data-type="step"]'))
-        el.style.display = 'none';
-    for (let el of document.querySelectorAll(`tr[data-type="step"][data-section-index="${stepSection[stepIndex]}"]`))
-        el.style.display = '';
-    document.querySelector(`tr[data-type="step"][data-step-index="${stepIndex}"]`).classList.add('active');
+    for (const element of document.querySelectorAll('tr[data-type="step"]')) {
+        element.style.display = "none";
+    }
 
-    let sectionUnsolved = {};
+    if (stepOrder.length === 0) {
+        return;
+    }
+
+    for (const element of document.querySelectorAll(
+        `tr[data-type="step"][data-section-index="${stepSection[stepIndex]}"]`,
+    )) {
+        element.style.display = "";
+    }
+
+    document.querySelector(`tr[data-type="step"][data-step-index="${stepIndex}"]`)?.classList.add("active");
+    document.querySelector(`tr[data-type="section"][data-section-index="${stepSection[stepIndex]}"]`)?.classList.add("active");
+
+    const sectionUnsolved = {};
     let maxSection = 0;
 
-    for (let i = 0; i < stepOrder.length; i++) {
-        if (stepSection[i] > maxSection) maxSection = stepSection[i];
-        let check = document.querySelector(`tr[data-type="step"][data-step-key="${stepOrder[i]}"] .check`);
+    for (let i = 0; i < stepOrder.length; i += 1) {
+        maxSection = Math.max(maxSection, stepSection[i]);
+        const check = document.querySelector(
+            `tr[data-type="step"][data-step-key="${stepOrder[i]}"] .check`,
+        );
         if (state[stepOrder[i]]) {
-            check.classList.add('checked');
+            check?.classList.add("checked");
         } else {
-            check.classList.remove('checked');
+            check?.classList.remove("checked");
             sectionUnsolved[stepSection[i]] = true;
         }
     }
-    for (let i = 0; i <= maxSection; i++) {
-        let check = document.querySelector(`tr[data-type="section"][data-section-index="${i}"] .check`);
-        if (sectionUnsolved[i]) {
-            check.classList.remove('checked');
-        } else {
-            check.classList.add('checked');
-        }
+
+    for (let i = 0; i <= maxSection; i += 1) {
+        const check = document.querySelector(`tr[data-type="section"][data-section-index="${i}"] .check`);
+        check?.classList.toggle("checked", !sectionUnsolved[i]);
     }
 }
 
 function checkTaskSolved() {
-    let solved = true;
-    for (let el of document.querySelectorAll('#instruction .check')) {
-        if (!el.classList.contains('checked')) {
-            solved = false;
-            break;
-        }
-    }
+    const checks = document.querySelectorAll("#instruction .check");
+    const solved = checks.length > 0 && Array.from(checks).every(
+        element => element.classList.contains("checked"),
+    );
+
     if (solved) {
         markTaskComplete();
     } else {
@@ -102,122 +222,162 @@ function checkTaskSolved() {
 }
 
 function markTaskComplete() {
-    if (markedAsComplete) return;
-
-    vscode.postMessage({
-        command: 'mark_step_complete',
-        step: stepOrder[stepIndex],
-    });
-
-    let button = document.querySelector('#bu_next');
+    const button = document.querySelector("#bu_next");
     button.disabled = false;
-    button.classList.remove('pop');
-    void button.offsetWidth;
-    button.classList.add('pop');
+
+    if (!markedAsComplete) {
+        button.classList.remove("pop");
+        void button.offsetWidth;
+        button.classList.add("pop");
+    }
+
     markedAsComplete = true;
+    if (!state[currentStepKey]) {
+        state[currentStepKey] = true;
+        currentStepPersistedComplete = true;
+        updateToc();
+        vscode.postMessage({
+            command: "mark_step_complete",
+            step: currentStepKey,
+        });
+    }
 }
 
 function markTaskIncomplete() {
-    if (!markedAsComplete) return;
-
-    document.querySelector('#bu_next').disabled = true;
+    if (currentStepPersistedComplete) {
+        return;
+    }
+    document.querySelector("#bu_next").disabled = true;
     markedAsComplete = false;
 }
 
-function clickStep(n) {
-    stepIndex = n;
-    stepIndex = parseInt(`${stepIndex}`);
+function clickStep(n, restart = false) {
+    const parsedIndex = Number.parseInt(`${n}`, 10);
+    if (!Number.isInteger(parsedIndex) || parsedIndex < 0 || parsedIndex >= stepOrder.length) {
+        return;
+    }
+
+    stepIndex = parsedIndex;
+    currentStepKey = stepOrder[stepIndex];
+    currentStepPersistedComplete = state[currentStepKey] === true;
+    markedAsComplete = currentStepPersistedComplete;
+    showingCompletion = false;
+    resetStepRuntime();
+    document.querySelector("#instruction").innerHTML = "<p>Schritt wird geladen …</p>";
+    const nextButton = document.querySelector("#bu_next");
+    nextButton.querySelector("span").textContent = "Nächster Schritt";
+    nextButton.disabled = !currentStepPersistedComplete;
     updateToc();
-    handleOnDidChangeTextDocument = nop;
-    handleOnDidSaveTextDocument = nop;
-    handleOnDidChangeTextEditorSelection = nop;
-    handleOnDidChangeActiveTextEditor = nop;
-    handleOnDidChangeTextEditorOptions = nop;
-    handleOnDidChangeTextEditorVisibleRanges = nop;
-    markedAsComplete = false;
 
     vscode.postMessage({
-        command: 'load_step',
-        key: stepOrder[stepIndex],
+        command: "load_step",
+        key: currentStepKey,
+        restart,
     });
 }
 
+function clickRestartStep() {
+    clickStep(stepIndex, true);
+}
+
 function clickNextStep() {
-    stepIndex = parseInt(`${stepIndex}`);
-    let oldStepIndex = stepIndex;
-    stepIndex = (stepIndex + 1) % stepOrder.length;
-    while (stepIndex != oldStepIndex) {
-        if (!status[stepOrder[stepIndex]]) break;
-        stepIndex = (stepIndex + 1) % stepOrder.length;
+    if (stepIndex + 1 < stepOrder.length) {
+        clickStep(stepIndex + 1);
+        return;
     }
-    if (oldStepIndex !== stepIndex)
-        clickStep(stepIndex);
+
+    showingCompletion = true;
+    resetStepRuntime();
+    const completedSteps = stepOrder.filter(key => state[key]).length;
+    document.querySelector("#instruction").innerHTML = `
+        <h2>Bis hierhin geschafft!</h2>
+        <p>Du hast ${completedSteps} von ${stepOrder.length} Tutorial-Schritten erledigt.</p>
+        <p>Über das Inhaltsverzeichnis kannst du einzelne Übungen jederzeit wiederholen.</p>
+    `;
+    const nextButton = document.querySelector("#bu_next");
+    nextButton.querySelector("span").textContent = "Zwischenstand erreicht";
+    nextButton.disabled = true;
 }
 
 function clickSection(n) {
-    if (firstStepForSection[n] === null) return;
-    clickStep(firstStepForSection[n])
+    const sectionIndex = Number.parseInt(`${n}`, 10);
+    if (firstStepForSection[sectionIndex] === null) {
+        return;
+    }
+    clickStep(firstStepForSection[sectionIndex]);
 }
 
-window.addEventListener('DOMContentLoaded', function () {
-    let nr = 0;
+window.addEventListener("DOMContentLoaded", () => {
+    let number = 0;
     const tbody = document.querySelector("table.toc tbody");
-    for (let section of sections.sections) {
-        nr += 1;
+    for (const section of sections.sections) {
+        number += 1;
 
         tbody.insertAdjacentHTML("beforeend", `
-        <tr data-type='section' data-section-index='${nr - 1}'>
-            <td>${nr}.</td>
-            <td colspan="2">${section.heading}</td>
-            <td>${checkBox()}</td>
-        </tr>
+            <tr data-type="section" data-section-index="${number - 1}">
+                <td>${number}.</td>
+                <td colspan="2">${section.heading}</td>
+                <td>${checkBox()}</td>
+            </tr>
         `);
         firstStepForSection.push(null);
-        for (let step of section.steps) {
+
+        for (const step of section.steps) {
             if (firstStepForSection[firstStepForSection.length - 1] === null) {
                 firstStepForSection[firstStepForSection.length - 1] = stepOrder.length;
             }
             stepOrder.push(step.key);
-            stepSection.push(nr - 1);
+            stepSection.push(number - 1);
             tbody.insertAdjacentHTML("beforeend", `
-            <tr data-type='step' data-step-index='${stepOrder.length - 1}' data-step-key='${step.key}' data-section-index='${nr - 1}'>
-                <td></td>
-                <td style="width: 0.5em;">&ndash;</td>
-                <td>${step.heading}</td>
-                <td>${checkBox()}</td>
-            </tr>
+                <tr data-type="step" data-step-index="${stepOrder.length - 1}"
+                    data-step-key="${step.key}" data-section-index="${number - 1}">
+                    <td></td>
+                    <td style="width: 0.5em;">&ndash;</td>
+                    <td>${step.heading}</td>
+                    <td>${checkBox()}</td>
+                </tr>
             `);
-
         }
     }
-    tbody.addEventListener('click', (e) => {
-        let row = e.target.closest('tr[data-type="section"]');
+
+    tbody.addEventListener("click", event => {
+        let row = event.target.closest('tr[data-type="section"]');
         if (row) {
             clickSection(row.dataset.sectionIndex);
+            return;
         }
-        row = e.target.closest('tr[data-type="step"]');
+        row = event.target.closest('tr[data-type="step"]');
         if (row) {
             clickStep(row.dataset.stepIndex);
         }
     });
+
     updateToc();
-    vscode.postMessage({ command: 'ready'});
+    vscode.postMessage({ command: "ready" });
 });
 
 function checkBox(id) {
-    return `<span id='${id}' class='check'><svg class="icon"><use href="#circle-dotted"></use></svg><svg class="icon"><use href="#check"></use></svg></span>`;
+    const idAttribute = id ? ` id="${id}"` : "";
+    return `<span${idAttribute} class="check"><svg class="icon"><use href="#circle-dotted"></use></svg><svg class="icon"><use href="#check"></use></svg></span>`;
 }
 
 function setCheckBox(id, flag) {
-    let check = document.querySelector(`#instruction #${id}.check`);
-    if (flag) {
-        check.classList.add('checked');
-    } else {
-        check.classList.remove('checked');
-    }
+    const check = document.querySelector(`#instruction #${id}.check`);
+    check?.classList.toggle("checked", Boolean(flag));
 }
 
 function getCheckBox(id) {
-    let check = document.querySelector(`#instruction #${id}.check`);
-    return check.classList.contains('checked');
+    const check = document.querySelector(`#instruction #${id}.check`);
+    return check?.classList.contains("checked") ?? false;
+}
+
+function selectionEquals(selection, startLine, startCharacter, endLine, endCharacter) {
+    return selection.start.line === startLine &&
+        selection.start.character === startCharacter &&
+        selection.end.line === endLine &&
+        selection.end.character === endCharacter;
+}
+
+function isCursorAt(selection, line, character) {
+    return selection.isEmpty && selection.start.line === line && selection.start.character === character;
 }

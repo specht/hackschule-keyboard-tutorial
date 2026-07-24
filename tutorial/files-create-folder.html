@@ -1,0 +1,80 @@
+<yaml>
+workspace: tutorial/workspace/files-create-folder
+</yaml>
+
+<h2>Einen Ordner anlegen</h2>
+
+<p>
+    Das Symbol <strong>Neuer Ordner</strong> im Explorer legt einen Ordner
+    unterhalb des ausgewählten Ordners an. Danach kannst du darin weitere
+    Dateien erstellen.
+</p>
+
+<table id="table"></table>
+
+<script>
+let folderCreated = false;
+let fileCreated = false;
+const expected = 'Hier kommen Bilder hinein.';
+
+handleOnDidCreateFiles = function(e) {
+    for (const file of e.files || []) {
+        if (file.relativePath === 'bilder') {
+            folderCreated = true;
+            setCheckBox('s0', true);
+        }
+        if (file.relativePath === 'bilder/beschreibung.txt') {
+            fileCreated = true;
+            setCheckBox('s1', true);
+        }
+    }
+
+    checkTaskSolved();
+};
+
+handleOnDidSaveTextDocument = function(e, contents) {
+    if (
+        folderCreated &&
+        fileCreated &&
+        e.document &&
+        e.document.isDirty === false &&
+        e.document.fileName.endsWith('beschreibung.txt') &&
+        contents === expected
+    ) {
+        setCheckBox('s2', true);
+    }
+
+    checkTaskSolved();
+};
+
+const table = document.querySelector('#table');
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s0')}</td>
+        <td>
+            Lege im Ordner <code>files-create-folder</code> den Ordner
+            <code>bilder</code> an.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s1')}</td>
+        <td>
+            Lege darin die Datei <code>beschreibung.txt</code> an.
+        </td>
+    </tr>
+`);
+
+table.insertAdjacentHTML('beforeend', `
+    <tr>
+        <td style="width: 1.2em;">${checkBox('s2')}</td>
+        <td>
+            Schreibe <code>Hier kommen Bilder hinein.</code> hinein und
+            speichere die Datei.
+        </td>
+    </tr>
+`);
+</script>
