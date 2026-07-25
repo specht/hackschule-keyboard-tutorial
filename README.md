@@ -1,6 +1,19 @@
 # Hackschule Keyboard Tutorial
 
-Eine interaktive VS-Code-Erweiterung, mit der Schülerinnen und Schüler grundlegende Tastatur-, Navigations- und Textbearbeitungsfertigkeiten üben.
+Eine interaktive VS-Code-Erweiterung, mit der Schülerinnen und Schüler grundlegende Tastatur-, Navigations- und Textbearbeitungsfertigkeiten praktisch üben.
+
+Das Tutorial umfasst acht Kapitel:
+
+1. Die Tastatur
+2. Navigieren im Dokument
+3. Text markieren
+4. Text bearbeiten
+5. Suchen und Ersetzen
+6. Mehrere Stellen gleichzeitig bearbeiten
+7. Code bearbeiten
+8. Dateien, Ordner und Tabs
+
+Die vollständige inhaltliche Übersicht steht in [`CURRICULUM.md`](CURRICULUM.md).
 
 ## Entwicklung
 
@@ -38,11 +51,6 @@ Hilfsfunktionen wie `checkBox`, `setCheckBox`, `getCheckBox`, `selectionEquals`,
 
 Der Fortschritt wird in `~/.hs-kbd-tutorial/.state.json` gespeichert.
 
-
 ## Datei- und Ordnerübungen
 
-Das Kapitel **Dateien, Ordner und Tabs** verwendet einen einzigen isolierten
-Arbeitsordner unter `~/.hs-kbd-tutorial/Tastatur-Tutorial`. Seine Struktur
-bleibt während des gesamten Kapitels sichtbar. Die einzelnen Schritte öffnen
-oder verändern nur die jeweils benötigten Einträge; sie tauschen nicht mehr
-den kompletten Explorer-Inhalt aus.
+Das Kapitel **Dateien, Ordner und Tabs** verwendet einen einzigen isolierten Arbeitsordner unter `~/.hs-kbd-tutorial/Tastatur-Tutorial`. Seine Struktur bleibt während des gesamten Kapitels sichtbar. Die einzelnen Schritte öffnen oder verändern nur die jeweils benötigten Einträge.

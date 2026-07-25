@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Das Tutorial ist als achtteiliges Curriculum abgeschlossen; geplante Kapitel zu Ansicht/Fokus, Terminal und Abschlussaufgabe wurden entfernt.
+- Der Zeilenumbruch mit `Alt+Z` ist als Tastaturübung in das Kapitel **Navigieren im Dokument** integriert.
 - Die Datei- und Ordnerübungen verwenden einen einzigen stabilen, isolierten Arbeitsordner für das gesamte Kapitel.
 - Bereits angelegte, umbenannte oder gelöschte Einträge bleiben beim Wechsel zur nächsten Übung sichtbar.
 - **Neu starten** setzt bei verändernden Dateiübungen nur die betroffenen Einträge zurück; beim Kapitelstart kann der gesamte Arbeitsordner neu aufgebaut werden.

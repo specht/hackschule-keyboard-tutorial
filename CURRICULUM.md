@@ -5,26 +5,24 @@
 Das Tutorial folgt dem Prinzip **Learning by Doing**:
 
 - Einführungen erklären nur die neue Idee und die dafür nötigen Bedienelemente.
-- Konkrete Arbeitsaufträge stehen ausschließlich in den überprüfbaren Aufgabenzeilen.
-- Jede Aufgabenzeile muss einen Zustand erzeugen, den die Extension tatsächlich erkennen kann.
+- Konkrete Arbeitsaufträge stehen ausschließlich in überprüfbaren Aufgabenzeilen.
+- Jede Aufgabenzeile erzeugt einen Zustand, den die Extension erkennen kann.
 - Bewertet wird möglichst das Ergebnis – Cursorposition, Markierung, Dateiinhalt, Dateiname, Tabzustand oder gespeicherter Zustand – und nicht ein unsichtbarer Tastendruck.
 - Bereits gelernte Abläufe werden in späteren Übungen nicht vollständig wiederholt.
-- Die Beispiele setzen keine Kenntnisse einer Programmiersprache voraus. Sichtbare Strukturen werden jeweils kurz erklärt.
+- Beispiele mit Programmcode erklären nur die sichtbare Struktur und setzen keine Kenntnisse der verwendeten Sprache voraus.
 - Beispieldateien enden nur dann mit einem Zeilenumbruch, wenn dies für die Aufgabe beabsichtigt ist.
-- Beim Verlassen einer abgeschlossenen Aufgabe wird ihre Arbeitsdatei oder ihr Übungsordner zurückgesetzt und geöffnete Übungstabs werden geschlossen.
+- Beim Verlassen einer abgeschlossenen Aufgabe werden Übungsdateien zurückgesetzt und geöffnete Übungstabs geschlossen.
 - Unfertige, ungespeicherte Arbeit wird nicht automatisch verworfen.
 
 ## 1. Die Tastatur
 
-- Buchstaben, Ziffern und Satzzeichen finden
-- Pfeiltasten, Eingabetaste, Tabulatortaste und Leertaste
-- Rücktaste, Entfernen und Escape
-- Strg, Shift, Alt und AltGr
+- Buchstaben, Ziffern und wichtige Sonderzeichen finden
+- Pfeiltasten, Eingabetaste, Tabulatortaste und Leertaste verwenden
+- Rücktaste, Entfernen und Escape unterscheiden
+- Strg, Shift, Alt und AltGr kennenlernen
 - Tastenkombinationen korrekt gedrückt halten
-- Zeichen mit Shift eingeben
-- Zeichen mit AltGr eingeben
+- Zeichen mit Shift und AltGr eingeben
 - Akzent- und Tottasten verwenden
-- Feststelltasten verstehen
 
 ## 2. Navigieren im Dokument
 
@@ -32,36 +30,29 @@ Das Tutorial folgt dem Prinzip **Learning by Doing**:
 - Wortweise mit Strg und Pfeiltasten springen
 - Zum Anfang und Ende einer Zeile springen
 - Seitenweise blättern
-- Zum Anfang und Ende der Datei springen
+- Zum Anfang und Ende einer Datei springen
 - Zu einer bestimmten Zeile springen
 - Den sichtbaren Bildausschnitt verschieben, ohne den Cursor mitzubewegen
-- Mehrere Navigationsbefehle in einer Abschlussübung kombinieren
+- Lange Dokumentzeilen mit Alt+Z sichtbar umbrechen und den Unterschied zwischen sichtbarem Abschnitt und logischer Dokumentzeile verstehen
 
 ## 3. Text markieren
 
-- Mit der Maus markieren
-- Ein Wort mit Doppelklick markieren
-- Eine Zeile mit Dreifachklick markieren
-- Mit Shift und Pfeiltasten markieren
+- Text mit der Maus markieren
+- Text mit Shift und Pfeiltasten markieren
 - Wortweise markieren
-- Bis zum Zeilenanfang oder Zeilenende markieren
-- Mehrere Zeilen markieren
+- Wörter und ganze Zeilen mit der Maus auswählen
 - Alles markieren
-- Eine Markierung vergrößern und verkleinern
+- Markierungen vergrößern und verkleinern
 
 ## 4. Text bearbeiten
 
 - Text an der Cursorposition einfügen
-- Zeilenumbrüche einfügen
-- Mit Rücktaste und Entfernen löschen
 - Eine Markierung durch neuen Text ersetzen
-- Zeilen verbinden
+- Zeilenumbrüche einfügen und entfernen
+- Mit Rücktaste und Entfernen löschen
 - Änderungen rückgängig machen und wiederholen
-- Kopieren und einfügen
-- Ausschneiden und einfügen
-- Markierten Text verschieben
-- Eine vollständige Zeile löschen
-- Ganze Zeilen verschieben und duplizieren
+- Kopieren, Ausschneiden und Einfügen
+- Ganze Zeilen löschen, verschieben und duplizieren
 - Mehrere Zeilen gemeinsam ein- und ausrücken
 - Eine Datei mit Strg+S speichern
 - Den Punkt im Tab als Hinweis auf ungespeicherte Änderungen verstehen
@@ -73,7 +64,7 @@ Das Tutorial folgt dem Prinzip **Learning by Doing**:
 - Mit F3 und Shift+F3 zwischen Treffern wechseln
 - Groß- und Kleinschreibung mit Alt+C (**Case**) beachten
 - Nur vollständige Wörter mit Alt+W (**Whole Word**) suchen
-- Die Suche mit Esc schließen
+- Such- und Ersetzdialoge mit Esc schließen
 - Mit Strg+H Suchen und Ersetzen öffnen
 - Mit Tab zwischen Such- und Ersatzfeld wechseln
 - Den aktuellen Treffer mit Enter ersetzen
@@ -102,81 +93,21 @@ Programmiersprachen werden als geeignete Beispiele für Bearbeitungstechniken ve
 - Einen JavaScript-Block mit geschweiften Klammern kopieren und nur die Kopie verändern
 - Zwei verschachtelte Einrückungsstufen in Dart herstellen
 - Einen C-Block verschieben, seine Einrückung korrigieren und eine Zeile entkommentieren
-- Eine reparierte C-Datei speichern
 - Beim Verschieben oder Kopieren vollständiger Blöcke die innere Einrückung erhalten
+- Eine reparierte Datei speichern
 
 ## 8. Dateien, Ordner und Tabs
 
-- Für das gesamte Kapitel einen einzigen isolierten Tutorial-Arbeitsordner verwenden
-- Das Tutorial vorübergehend in die sekundäre Seitenleiste verschieben
+- Für das Kapitel einen isolierten Tutorial-Arbeitsordner verwenden
 - Explorer links und Tutorial rechts gleichzeitig sichtbar halten
-- Dieselbe übersichtliche Ordnerstruktur während aller Dateiübungen beibehalten
-- Tief verschachtelte Dateien mit Quick Open finden, ohne den Ordnerbaum vollständig aufzuklappen
-- Den Explorer mit Strg+Shift+E öffnen und fokussieren
 - Dateien im Explorer finden und öffnen
-- Mit Strg+P eine Datei anhand ihres Namens schnell öffnen
+- Tief verschachtelte Dateien mit Strg+P anhand ihres Namens öffnen
 - Mit Strg+Bild ab und Strg+Bild auf zwischen benachbarten Tabs wechseln
-- Einen Editor-Tab im Browser sicher über das Kreuz im Tab schließen
+- Einen Editor-Tab im Browser sicher über das Kreuz schließen
 - Eine geschlossene Datei mit Strg+P wieder öffnen
-- Im Explorer über das Symbol Neue Datei eine Datei anlegen
-- Inhalt eingeben und die neue Datei speichern
-- Im Explorer über das Symbol Neuer Ordner einen Ordner anlegen
-- Eine Datei innerhalb eines Ordners erstellen
+- Über die Explorer-Symbole eine Datei und einen Ordner anlegen
+- Eine Datei innerhalb eines Ordners erstellen und speichern
 - Dateien und Ordner mit F2 umbenennen
 - Dateien und Ordner mit Entf löschen
 - Vor dem Löschen den ausgewählten Namen kontrollieren
 - Das Tutorial am Kapitelende in seinen ursprünglichen Bereich zurückverschieben
-
-## 9. Ansicht und Fokus
-
-- Zwischen Tutorial, Explorer und Editor wechseln
-- Die Seitenleiste ein- und ausblenden
-- Das untere Panel öffnen und schließen
-- Probleme, Ausgabe, Debugkonsole und Terminal unterscheiden
-- Den Editor teilen
-- Zwischen Editorgruppen wechseln
-- Zeilenumbruch ein- und ausschalten
-- Den Fokus gezielt zurück in den Editor setzen
-
-## 10. Command Palette und schnelle Navigation
-
-- Die Command Palette mit Strg+Shift+P öffnen
-- Einen Befehl anhand seines Namens suchen
-- Einen Befehl ohne bekanntes Tastenkürzel ausführen
-- Mit Quick Open Dateien öffnen
-- Zu einer Zeile springen
-- Zu einem Symbol in einer Datei springen
-- Tastenkürzel in der Tastaturbelegung nachschlagen
-- Einen Befehl anhand seines englischen oder deutschen Namens finden
-
-## 11. Terminal
-
-- Das integrierte Terminal öffnen und fokussieren
-- Einen ungefährlichen Befehl eingeben und ausführen
-- Einen früheren Befehl mit Pfeil nach oben wiederholen
-- Einen Befehl vor dem erneuten Ausführen bearbeiten
-- Datei- und Ordnernamen mit Tab vervollständigen
-- Einen laufenden Befehl mit Strg+C abbrechen
-- Den Unterschied zwischen Kopieren im Editor und Abbrechen im Terminal verstehen
-- Im Terminal mit Strg+Shift+C und Strg+Shift+V kopieren und einfügen
-- Browser-Berechtigungen für die Zwischenablage verstehen
-- Den sichtbaren Terminalinhalt löschen
-- Zwischen Terminal und Editor wechseln
-
-## 12. Abschlussaufgabe
-
-Eine kleine beschädigte Arbeitsdatei oder ein Mini-Projekt wird vollständig repariert. Die Aufgabe kombiniert:
-
-- die richtige Datei öffnen
-- zu einer bestimmten Stelle navigieren
-- Text markieren und ersetzen
-- Zeilen oder vollständige Blöcke verschieben
-- Einrückung korrigieren
-- kommentieren und entkommentieren
-- suchen und ersetzen
-- mehrere Stellen gleichzeitig bearbeiten
-- Dateien oder Ordner passend benennen
-- das Ergebnis speichern
-- einen einfachen Terminalbefehl ausführen
-
-Die Abschlussprüfung bewertet den fertigen Projektzustand und nicht eine starre Folge einzelner Tastendrücke.

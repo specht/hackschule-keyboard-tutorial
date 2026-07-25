@@ -21,6 +21,8 @@ sections:
     key: navigate-goto-line
   - heading: Bildausschnitt verschieben
     key: navigate-move-region
+  - heading: Lange Zeilen umbrechen
+    key: navigate-word-wrap
 - heading: Text markieren
   steps:
   - heading: Text mit der Maus auswählen
@@ -63,7 +65,7 @@ sections:
     key: search-replace-challenge
 - heading: Mehrere Stellen gleichzeitig bearbeiten
   steps:
-  - heading: Mehrere Cursor mit der Maus
+  - heading: Cursor untereinander hinzufügen
     key: multi-cursor-mouse
   - heading: Das nächste Vorkommen auswählen
     key: multi-cursor-next
@@ -111,11 +113,3 @@ sections:
     key: files-delete
   - heading: Tutorial zurück verschieben
     key: files-layout-end
-# Weitere geplante Kapitel:
-# - Kopieren, Ausschneiden und Einfügen
-# - Text ein- und ausrücken
-# - Suchen und Ersetzen
-# - Multi-Cursor
-# - Dateien und Verzeichnisse
-# - Terminal
-# - Ansicht und Command Palette
