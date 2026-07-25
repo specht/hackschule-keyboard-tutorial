@@ -107,7 +107,10 @@ Programmiersprachen werden als geeignete Beispiele für Bearbeitungstechniken ve
 
 ## 8. Dateien, Ordner und Tabs
 
-- Den Explorer mit Strg+Shift+E öffnen
+- Für Dateiübungen einen isolierten Tutorial-Arbeitsbereich verwenden
+- Das Tutorial vorübergehend in die sekundäre Seitenleiste verschieben
+- Explorer links und Tutorial rechts gleichzeitig sichtbar halten
+- Den Explorer mit Strg+Shift+E öffnen und fokussieren
 - Dateien im Explorer finden und öffnen
 - Mit Strg+P eine Datei anhand ihres Namens schnell öffnen
 - Mit Strg+Bild ab und Strg+Bild auf zwischen benachbarten Tabs wechseln
@@ -120,6 +123,7 @@ Programmiersprachen werden als geeignete Beispiele für Bearbeitungstechniken ve
 - Dateien und Ordner mit F2 umbenennen
 - Dateien und Ordner mit Entf löschen
 - Vor dem Löschen den ausgewählten Namen kontrollieren
+- Das Tutorial am Kapitelende in seinen ursprünglichen Bereich zurückverschieben
 
 ## 9. Ansicht und Fokus
 

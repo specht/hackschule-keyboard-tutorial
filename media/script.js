@@ -49,6 +49,30 @@ function addStepEventListener(target, type, listener, options) {
     onStepCleanup(() => target.removeEventListener(type, listener, options));
 }
 
+function runTutorialAction(action, completeStep = false) {
+    vscode.postMessage({
+        command: "run_tutorial_action",
+        action,
+        completeStep: completeStep
+            ? currentStepKey
+            : undefined,
+    });
+}
+
+function completeManualTask(id, action) {
+    setCheckBox(id, true);
+    checkTaskSolved();
+
+    if (action) {
+        /*
+         * Include the step in the action message as well. Moving a view can
+         * recreate its webview, so the extension persists completion before
+         * it changes the workbench layout.
+         */
+        runTutorialAction(action, true);
+    }
+}
+
 function applySnapshot(snapshot) {
     if (!snapshot) {
         return;

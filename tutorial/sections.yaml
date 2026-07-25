@@ -91,6 +91,8 @@ sections:
     key: code-editing-challenge
 - heading: Dateien, Ordner und Tabs
   steps:
+  - heading: Explorer und Tutorial nebeneinander
+    key: files-layout-start
   - heading: Dateien im Explorer öffnen
     key: files-explorer-open
   - heading: Eine Datei schnell öffnen
@@ -107,6 +109,8 @@ sections:
     key: files-rename
   - heading: Dateien und Ordner löschen
     key: files-delete
+  - heading: Tutorial zurück verschieben
+    key: files-layout-end
 # Weitere geplante Kapitel:
 # - Kopieren, Ausschneiden und Einfügen
 # - Text ein- und ausrücken

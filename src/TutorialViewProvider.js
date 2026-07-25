@@ -396,56 +396,103 @@ class TutorialViewProvider {
         await this.copyFixtureDirectory(fixturePath, rootUri);
     }
 
-    async openWorkspaceStep(key, step, restart) {
-        let workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    async ensureManagedWorkspace(key) {
+        const managedWorkspaceUri =
+            vscode.Uri.file(managedWorkspacePath);
 
-        if (!workspaceFolder) {
-            /*
-             * The Explorer needs a workspace folder. Create a private
-             * tutorial workspace and open it automatically instead of
-             * asking the student to prepare one.
-             *
-             * Opening a folder in the current window restarts the extension
-             * host, so remember which step must resume afterwards.
-             */
-            const managedWorkspaceUri =
-                vscode.Uri.file(managedWorkspacePath);
+        const workspaceFolders =
+            vscode.workspace.workspaceFolders ?? [];
 
-            await vscode.workspace.fs.createDirectory(
+        const managedWorkspaceIsOpen =
+            workspaceFolders.length === 1 &&
+            workspaceFolders[0].uri.toString() ===
+                managedWorkspaceUri.toString();
+
+        if (managedWorkspaceIsOpen) {
+            return {
+                workspaceFolder: workspaceFolders[0],
+                reopeningWorkspace: false,
+            };
+        }
+
+        /*
+         * File-management exercises should never modify a student's
+         * currently open project. Use one isolated tutorial workspace for
+         * the whole chapter. Opening the folder restarts the extension host,
+         * so remember which step should resume afterwards.
+         */
+        await vscode.workspace.fs.createDirectory(
+            managedWorkspaceUri,
+        );
+
+        await this.context.globalState.update(
+            pendingWorkspaceStepStateKey,
+            {
+                key,
+                workspaceUri: managedWorkspaceUri.toString(),
+            },
+        );
+
+        try {
+            await vscode.commands.executeCommand(
+                "vscode.openFolder",
                 managedWorkspaceUri,
-            );
-
-            await this.context.globalState.update(
-                pendingWorkspaceStepStateKey,
                 {
-                    key,
-                    workspaceUri: managedWorkspaceUri.toString(),
+                    forceReuseWindow: true,
+                    noRecentEntry: true,
                 },
             );
+        } catch (error) {
+            await this.context.globalState.update(
+                pendingWorkspaceStepStateKey,
+                undefined,
+            );
+            throw error;
+        }
 
-            try {
-                await vscode.commands.executeCommand(
-                    "vscode.openFolder",
-                    managedWorkspaceUri,
-                    {
-                        forceReuseWindow: true,
-                        noRecentEntry: true,
-                    },
-                );
-            } catch (error) {
-                await this.context.globalState.update(
-                    pendingWorkspaceStepStateKey,
-                    undefined,
-                );
-                throw error;
-            }
+        return {
+            workspaceFolder: undefined,
+            reopeningWorkspace: true,
+        };
+    }
 
+    async openWorkspaceTransitionStep(key) {
+        const workspaceResult =
+            await this.ensureManagedWorkspace(key);
+
+        if (workspaceResult.reopeningWorkspace) {
             return {
                 document: undefined,
                 editor: undefined,
                 reopeningWorkspace: true,
             };
         }
+
+        this.activeTutorialDocumentUri = undefined;
+        this.activeTutorialOriginalContents = undefined;
+        this.activeTutorialRootUri = undefined;
+        this.activeWorkspaceFixturePath = undefined;
+
+        return {
+            document: undefined,
+            editor: undefined,
+        };
+    }
+
+    async openWorkspaceStep(key, step, restart) {
+        const workspaceResult =
+            await this.ensureManagedWorkspace(key);
+
+        if (workspaceResult.reopeningWorkspace) {
+            return {
+                document: undefined,
+                editor: undefined,
+                reopeningWorkspace: true,
+            };
+        }
+
+        const workspaceFolder =
+            workspaceResult.workspaceFolder;
 
         const fixturePath = vscode.Uri.joinPath(
             this.context.extensionUri,
@@ -569,6 +616,46 @@ class TutorialViewProvider {
         };
     }
 
+    async runTutorialAction(action) {
+        if (action === "moveTutorialView") {
+            /*
+             * A click inside a webview does not necessarily set VS Code's
+             * focusedView context key. Pass the view id directly instead of
+             * relying on focus, otherwise Move Focused View can report that
+             * no view is focused.
+             */
+            await vscode.commands.executeCommand(
+                "workbench.action.moveFocusedView",
+                "typingSteps",
+            );
+            return;
+        }
+
+        if (action === "resetTutorialView") {
+            /*
+             * Use the same explicit view id on the way back. The learner
+             * chooses the existing Hackschule container in the primary Side
+             * Bar. This avoids relying on the fragile focusedView context.
+             */
+            await vscode.commands.executeCommand(
+                "workbench.action.moveFocusedView",
+                "typingSteps",
+            );
+            return;
+        }
+
+        if (action === "showExplorer") {
+            await vscode.commands.executeCommand(
+                "workbench.view.explorer",
+            );
+            return;
+        }
+
+        throw new Error(
+            `Unknown tutorial action: ${action}`,
+        );
+    }
+
     async loadStep(message, webview) {
         const key = message.key;
 
@@ -582,9 +669,19 @@ class TutorialViewProvider {
 
         const shouldReset = message.restart === true || state[key] === true;
 
-        const openResult = step.workspace
-            ? await this.openWorkspaceStep(key, step, shouldReset)
-            : await this.openStepDocument(key, step, shouldReset);
+        const openResult = step.requiresWorkspace
+            ? await this.openWorkspaceTransitionStep(key)
+            : step.workspace
+                ? await this.openWorkspaceStep(
+                    key,
+                    step,
+                    shouldReset,
+                )
+                : await this.openStepDocument(
+                    key,
+                    step,
+                    shouldReset,
+                );
 
         /*
          * vscode.openFolder() restarts the extension host. Do not render an
@@ -669,6 +766,15 @@ class TutorialViewProvider {
                         command: "update_state",
                         state: this.readCompletionState(),
                     });
+                } else if (message.command === "run_tutorial_action") {
+                    if (message.completeStep) {
+                        this.markStepComplete(message.completeStep);
+                        this.postMessage({
+                            command: "update_state",
+                            state: this.readCompletionState(),
+                        });
+                    }
+                    await this.runTutorialAction(message.action);
                 } else if (message.command === "ready") {
                     const state = this.readCompletionState();
                     this.postMessage({ command: "update_state", state });
@@ -693,6 +799,13 @@ class TutorialViewProvider {
                             pendingWorkspaceStepStateKey,
                             undefined,
                         );
+                    } else if (this.currentStepKey) {
+                        /*
+                         * Moving a view between sidebars can recreate its
+                         * webview. Resume the step that was already open
+                         * instead of jumping to the first incomplete step.
+                         */
+                        requestedStepKey = this.currentStepKey;
                     }
 
                     let firstStep = 0;

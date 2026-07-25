@@ -55,8 +55,22 @@ suite("Hackschule Keyboard Tutorial", () => {
 
                 const metadata = yaml.parse(metadataText);
                 if (metadata?.file) {
-                    const fixturePath = path.join(extensionRoot, metadata.file);
-                    assert.ok(fs.existsSync(fixturePath), `Missing fixture: ${metadata.file}`);
+                    const fixturePath =
+                        path.join(extensionRoot, metadata.file);
+                    assert.ok(
+                        fs.existsSync(fixturePath),
+                        `Missing fixture: ${metadata.file}`,
+                    );
+                }
+
+                if (metadata?.workspace) {
+                    const fixturePath =
+                        path.join(extensionRoot, metadata.workspace);
+                    assert.ok(
+                        fs.existsSync(fixturePath) &&
+                            fs.statSync(fixturePath).isDirectory(),
+                        `Missing workspace fixture: ${metadata.workspace}`,
+                    );
                 }
             }
         }
