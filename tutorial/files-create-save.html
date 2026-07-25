@@ -1,13 +1,19 @@
 <yaml>
-workspace: tutorial/workspace/files-create-save
+workspace: tutorial/workspace/files-chapter
+sharedWorkspace: files
+sharedWorkspaceVersion: 2
+resetPaths:
+  - meine-notiz.txt
 </yaml>
 
 <h2>Eine neue Datei anlegen</h2>
 
 <p>
-    Im Explorer legt das Symbol <strong>Neue Datei</strong> eine Datei im
-    ausgewählten Ordner an. Nach der Eingabe des Namens bestätigst du mit
-    <key>Enter</key>.
+    Markiere im Explorer zunächst eine Datei, die direkt im
+    Tutorial-Ordner liegt, zum Beispiel <code>willkommen.txt</code>.
+    Bewegst du die Maus in den Explorer, erscheint oben rechts das Symbol
+    <svg class="icon"><use href="#file-plus"></use></svg>
+    <strong>Neue Datei</strong>.
 </p>
 
 <table id="table"></table>
@@ -47,8 +53,10 @@ table.insertAdjacentHTML('beforeend', `
     <tr>
         <td style="width: 1.2em;">${checkBox('s0')}</td>
         <td>
-            Lege im Ordner <code>files-create-save</code> die Datei
-            <code>meine-notiz.txt</code> an.
+            Markiere im Explorer die Datei <code>willkommen.txt</code>.
+            Klicke anschließend oben rechts auf
+            <svg class="icon" style="transform: translate(0, 0.1em);"><use href="#file-plus"></use></svg>
+            und lege daneben die Datei <code>meine-notiz.txt</code> an.
         </td>
     </tr>
 `);

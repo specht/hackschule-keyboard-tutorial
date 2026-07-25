@@ -107,18 +107,20 @@ Programmiersprachen werden als geeignete Beispiele für Bearbeitungstechniken ve
 
 ## 8. Dateien, Ordner und Tabs
 
-- Für Dateiübungen einen isolierten Tutorial-Arbeitsbereich verwenden
+- Für das gesamte Kapitel einen einzigen isolierten Tutorial-Arbeitsordner verwenden
 - Das Tutorial vorübergehend in die sekundäre Seitenleiste verschieben
 - Explorer links und Tutorial rechts gleichzeitig sichtbar halten
+- Dieselbe übersichtliche Ordnerstruktur während aller Dateiübungen beibehalten
+- Tief verschachtelte Dateien mit Quick Open finden, ohne den Ordnerbaum vollständig aufzuklappen
 - Den Explorer mit Strg+Shift+E öffnen und fokussieren
 - Dateien im Explorer finden und öffnen
 - Mit Strg+P eine Datei anhand ihres Namens schnell öffnen
 - Mit Strg+Bild ab und Strg+Bild auf zwischen benachbarten Tabs wechseln
-- Den aktiven Tab unter Linux mit Strg+W schließen
-- Den zuletzt geschlossenen Editor mit Strg+Shift+T wieder öffnen
-- Im Explorer eine neue Datei anlegen
+- Einen Editor-Tab im Browser sicher über das Kreuz im Tab schließen
+- Eine geschlossene Datei mit Strg+P wieder öffnen
+- Im Explorer über das Symbol Neue Datei eine Datei anlegen
 - Inhalt eingeben und die neue Datei speichern
-- Einen neuen Ordner anlegen
+- Im Explorer über das Symbol Neuer Ordner einen Ordner anlegen
 - Eine Datei innerhalb eines Ordners erstellen
 - Dateien und Ordner mit F2 umbenennen
 - Dateien und Ordner mit Entf löschen

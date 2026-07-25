@@ -90,6 +90,7 @@ body {
     &.secondary {
         background-color: var(--my-button-secondaryBackground);
         color: var(--my-button-secondaryForeground);
+        border: 1px solid color-mix(in hsl, var(--my-editor-foreground) 20%, transparent);
 
         &:hover:not([disabled]) {
             background-color: var(--my-button-secondaryHoverBackground);
@@ -329,4 +330,33 @@ key {
     border-radius: 0.25em;
     user-select: text;
     white-space: pre-wrap;
+}
+
+.explorer-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+    white-space: nowrap;
+}
+
+.explorer-action .icon {
+    position: relative;
+    top: 0.05em;
+}
+
+#table tr.task-action td {
+    vertical-align: middle;
+}
+
+#table tr.task-action td:first-child {
+    width: auto;
+    padding-right: 0.35rem;
+}
+
+#table tr.task-action td:last-child {
+    padding-left: 0;
+}
+
+#table tr.task-action button {
+    margin: 0;
 }

@@ -1,5 +1,7 @@
 <yaml>
-workspace: tutorial/workspace/files-quick-open
+workspace: tutorial/workspace/files-chapter
+sharedWorkspace: files
+sharedWorkspaceVersion: 2
 openFiles:
   - start.txt
 activeFile: start.txt
@@ -9,8 +11,9 @@ activeFile: start.txt
 
 <p>
     Mit <key>Strg</key> + <key>P</key> öffnest du die Dateisuche.
-    Tippe einen Teil des Dateinamens und bestätige den passenden Treffer
-    mit <key>Enter</key>.
+    So findest du eine Datei anhand ihres Namens, ohne die vielen
+    Unterordner im Explorer aufklappen zu müssen. Bestätige den passenden
+    Treffer mit <key>Enter</key>.
 </p>
 
 <table id="table"></table>
@@ -21,12 +24,12 @@ let planOpened = false;
 handleOnDidChangeActiveTextEditor = function(e) {
     const relativePath = e.resource && e.resource.relativePath;
 
-    if (!planOpened && relativePath === 'material/plan.txt') {
+    if (!planOpened && relativePath === 'unterlagen/archiv/plaene/plan.txt') {
         planOpened = true;
         setCheckBox('s0', true);
     }
 
-    if (planOpened && relativePath === 'material/karte.txt') {
+    if (planOpened && relativePath === 'material/sammlung/karten/karte.txt') {
         setCheckBox('s1', true);
     }
 
@@ -39,8 +42,9 @@ table.insertAdjacentHTML('beforeend', `
     <tr>
         <td style="width: 1.2em;">${checkBox('s0')}</td>
         <td>
-            Öffne mit <key>Strg</key> + <key>P</key> die Datei
-            <code>plan.txt</code>.
+            Irgendwo tief in den Unterordnern liegt
+            <code>plan.txt</code>. Öffne die Datei mit
+            <key>Strg</key> + <key>P</key>.
         </td>
     </tr>
 `);
@@ -49,7 +53,8 @@ table.insertAdjacentHTML('beforeend', `
     <tr>
         <td style="width: 1.2em;">${checkBox('s1')}</td>
         <td>
-            Öffne auf dieselbe Weise <code>karte.txt</code>.
+            Öffne auf dieselbe Weise die ebenfalls versteckte Datei
+            <code>karte.txt</code>.
         </td>
     </tr>
 `);

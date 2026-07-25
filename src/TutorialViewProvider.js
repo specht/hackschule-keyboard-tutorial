@@ -6,8 +6,14 @@ const path = require("path");
 
 const tutorialDir = path.join(os.homedir(), ".hs-kbd-tutorial");
 const stateFilePath = path.join(tutorialDir, ".state.json");
-const workspaceTutorialFolder = "Tastatur-Tutorial";
-const managedWorkspacePath = path.join(tutorialDir, "workspace");
+const managedWorkspacePath = path.join(
+    tutorialDir,
+    "Tastatur-Tutorial",
+);
+const workspaceStepStatePath = path.join(
+    tutorialDir,
+    "workspace-step-states",
+);
 const pendingWorkspaceStepStateKey =
     "hackschuleKeyboardTutorial.pendingWorkspaceStep";
 
@@ -58,6 +64,8 @@ class TutorialViewProvider {
         this.activeTutorialOriginalContents = undefined;
         this.activeTutorialRootUri = undefined;
         this.activeWorkspaceFixturePath = undefined;
+        this.activeWorkspaceStepKey = undefined;
+        this.activeWorkspaceSharedKey = undefined;
         this.activeEventTypes = new Set();
         this.currentStepKey = undefined;
         this.loadQueue = Promise.resolve();
@@ -284,6 +292,7 @@ class TutorialViewProvider {
     async openStepDocument(key, step, restart) {
         this.activeTutorialRootUri = undefined;
         this.activeWorkspaceFixturePath = undefined;
+        this.activeWorkspaceSharedKey = undefined;
 
         if (!step.file) {
             this.activeTutorialDocumentUri = undefined;
@@ -380,20 +389,188 @@ class TutorialViewProvider {
         }
     }
 
-    async resetWorkspaceStep(rootUri, fixturePath) {
+    async clearDirectoryContents(rootUri) {
+        await vscode.workspace.fs.createDirectory(rootUri);
+
+        for (const [name] of await vscode.workspace.fs.readDirectory(
+            rootUri,
+        )) {
+            await vscode.workspace.fs.delete(
+                vscode.Uri.joinPath(rootUri, name),
+                {
+                    recursive: true,
+                    useTrash: false,
+                },
+            );
+        }
+    }
+
+    async copyUriDirectory(sourceUri, targetUri) {
+        await vscode.workspace.fs.createDirectory(targetUri);
+
+        for (const [name, type] of
+            await vscode.workspace.fs.readDirectory(sourceUri)) {
+            const sourceEntry = vscode.Uri.joinPath(sourceUri, name);
+            const targetEntry = vscode.Uri.joinPath(targetUri, name);
+
+            if (type === vscode.FileType.Directory) {
+                await this.copyUriDirectory(sourceEntry, targetEntry);
+            } else if (type === vscode.FileType.File) {
+                await vscode.workspace.fs.writeFile(
+                    targetEntry,
+                    await vscode.workspace.fs.readFile(sourceEntry),
+                );
+            }
+        }
+    }
+
+    workspaceStepStateUri(key) {
+        return vscode.Uri.file(
+            path.join(workspaceStepStatePath, key),
+        );
+    }
+
+    sharedWorkspaceStateKey(sharedKey, version = 1) {
+        return [
+            "hackschuleKeyboardTutorial.sharedWorkspace",
+            sharedKey,
+            version,
+        ].join(".");
+    }
+
+    async copyFixtureEntry(sourcePath, targetUri) {
+        if (!fs.existsSync(sourcePath)) {
+            return;
+        }
+
+        const stat = fs.statSync(sourcePath);
+        if (stat.isDirectory()) {
+            await this.copyFixtureDirectory(sourcePath, targetUri);
+        } else if (stat.isFile()) {
+            await vscode.workspace.fs.writeFile(
+                targetUri,
+                fs.readFileSync(sourcePath),
+            );
+        }
+    }
+
+    async resetSharedWorkspacePaths(rootUri, fixturePath, paths) {
+        for (const relativePath of paths) {
+            const targetUri = vscode.Uri.joinPath(
+                rootUri,
+                ...relativePath.split("/"),
+            );
+
+            if (await this.uriExists(targetUri)) {
+                await vscode.workspace.fs.delete(targetUri, {
+                    recursive: true,
+                    useTrash: false,
+                });
+            }
+
+            const sourcePath = path.join(
+                fixturePath,
+                ...relativePath.split("/"),
+            );
+            await this.copyFixtureEntry(sourcePath, targetUri);
+        }
+    }
+
+    async ensureSharedWorkspaceContents(
+        rootUri,
+        fixturePath,
+        sharedKey,
+        version,
+    ) {
+        const stateKey = this.sharedWorkspaceStateKey(
+            sharedKey,
+            version,
+        );
+        const initialized = this.context.globalState.get(
+            stateKey,
+            false,
+        );
+        const sentinelExists = await this.uriExists(
+            vscode.Uri.joinPath(rootUri, "willkommen.txt"),
+        );
+
+        if (initialized && sentinelExists) {
+            return;
+        }
+
         await this.closeTabs(
             this.findTabsInsideRoot(rootUri),
             true,
         );
+        await this.clearDirectoryContents(rootUri);
+        await this.copyFixtureDirectory(fixturePath, rootUri);
 
-        if (await this.uriExists(rootUri)) {
-            await vscode.workspace.fs.delete(rootUri, {
+        const obsoleteStepStates = vscode.Uri.file(
+            workspaceStepStatePath,
+        );
+        if (await this.uriExists(obsoleteStepStates)) {
+            await vscode.workspace.fs.delete(obsoleteStepStates, {
                 recursive: true,
                 useTrash: false,
             });
         }
 
-        await this.copyFixtureDirectory(fixturePath, rootUri);
+        await this.context.globalState.update(stateKey, true);
+    }
+
+    async removeWorkspaceStepState(key) {
+        const stateUri = this.workspaceStepStateUri(key);
+        if (await this.uriExists(stateUri)) {
+            await vscode.workspace.fs.delete(stateUri, {
+                recursive: true,
+                useTrash: false,
+            });
+        }
+    }
+
+    async saveDirtyDocumentsInside(rootUri) {
+        for (const document of vscode.workspace.textDocuments) {
+            if (document.isDirty &&
+                this.isUriInside(rootUri, document.uri)) {
+                await document.save();
+            }
+        }
+    }
+
+    async storeWorkspaceStepState(key, rootUri) {
+        await this.saveDirtyDocumentsInside(rootUri);
+
+        const stateUri = this.workspaceStepStateUri(key);
+        if (await this.uriExists(stateUri)) {
+            await vscode.workspace.fs.delete(stateUri, {
+                recursive: true,
+                useTrash: false,
+            });
+        }
+
+        await this.copyUriDirectory(rootUri, stateUri);
+    }
+
+    async resetWorkspaceStep(rootUri, fixturePath, key, restart) {
+        await this.closeTabs(
+            this.findTabsInsideRoot(rootUri),
+            true,
+        );
+
+        await this.clearDirectoryContents(rootUri);
+
+        const stateUri = this.workspaceStepStateUri(key);
+        const useSavedState =
+            !restart && await this.uriExists(stateUri);
+
+        if (useSavedState) {
+            await this.copyUriDirectory(stateUri, rootUri);
+        } else {
+            if (restart) {
+                await this.removeWorkspaceStepState(key);
+            }
+            await this.copyFixtureDirectory(fixturePath, rootUri);
+        }
     }
 
     async ensureManagedWorkspace(key) {
@@ -472,6 +649,8 @@ class TutorialViewProvider {
         this.activeTutorialOriginalContents = undefined;
         this.activeTutorialRootUri = undefined;
         this.activeWorkspaceFixturePath = undefined;
+        this.activeWorkspaceStepKey = undefined;
+        this.activeWorkspaceSharedKey = undefined;
 
         return {
             document: undefined,
@@ -506,19 +685,61 @@ class TutorialViewProvider {
             );
         }
 
-        const rootUri = vscode.Uri.joinPath(
-            workspaceFolder.uri,
-            workspaceTutorialFolder,
-            key,
-        );
+        const rootUri = workspaceFolder.uri;
+        const sharedKey = step.sharedWorkspace;
+        const sharedVersion = step.sharedWorkspaceVersion ?? 1;
+
+        const sameStepStillLoaded =
+            this.activeWorkspaceStepKey === key &&
+            this.activeTutorialRootUri?.toString() ===
+                rootUri.toString() &&
+            this.activeWorkspaceFixturePath === fixturePath;
 
         this.activeTutorialDocumentUri = undefined;
         this.activeTutorialOriginalContents = undefined;
         this.activeTutorialRootUri = rootUri;
         this.activeWorkspaceFixturePath = fixturePath;
+        this.activeWorkspaceStepKey = key;
+        this.activeWorkspaceSharedKey = sharedKey;
 
-        if (restart || !(await this.uriExists(rootUri))) {
-            await this.resetWorkspaceStep(rootUri, fixturePath);
+        if (sharedKey) {
+            await this.ensureSharedWorkspaceContents(
+                rootUri,
+                fixturePath,
+                sharedKey,
+                sharedVersion,
+            );
+
+            if (restart) {
+                await this.closeTabs(
+                    this.findTabsInsideRoot(rootUri),
+                    true,
+                );
+
+                if (step.resetSharedWorkspace === true) {
+                    await this.clearDirectoryContents(rootUri);
+                    await this.copyFixtureDirectory(
+                        fixturePath,
+                        rootUri,
+                    );
+                } else {
+                    const resetPaths = Array.isArray(step.resetPaths)
+                        ? step.resetPaths
+                        : [];
+                    await this.resetSharedWorkspacePaths(
+                        rootUri,
+                        fixturePath,
+                        resetPaths,
+                    );
+                }
+            }
+        } else if (restart || !sameStepStillLoaded) {
+            await this.resetWorkspaceStep(
+                rootUri,
+                fixturePath,
+                key,
+                restart,
+            );
         }
 
         let document;
@@ -560,20 +781,38 @@ class TutorialViewProvider {
         const completed = state[this.currentStepKey] === true;
 
         if (this.activeTutorialRootUri) {
-            if (completed && this.activeWorkspaceFixturePath) {
-                await this.resetWorkspaceStep(
-                    this.activeTutorialRootUri,
-                    this.activeWorkspaceFixturePath,
-                );
-            } else {
+            const previousStepKey = this.currentStepKey;
+
+            if (this.activeWorkspaceSharedKey) {
+                /*
+                 * Shared chapter workspaces stay in place while the learner
+                 * moves between exercises. Close finished exercise tabs, but
+                 * do not replace the Explorer contents with another fixture.
+                 */
                 await this.closeTabs(
                     this.findTabsInsideRoot(this.activeTutorialRootUri),
-                    false,
+                    completed,
+                );
+            } else {
+                if (completed) {
+                    await this.removeWorkspaceStepState(previousStepKey);
+                } else {
+                    await this.storeWorkspaceStepState(
+                        previousStepKey,
+                        this.activeTutorialRootUri,
+                    );
+                }
+
+                await this.closeTabs(
+                    this.findTabsInsideRoot(this.activeTutorialRootUri),
+                    true,
                 );
             }
 
             this.activeTutorialRootUri = undefined;
             this.activeWorkspaceFixturePath = undefined;
+            this.activeWorkspaceStepKey = undefined;
+            this.activeWorkspaceSharedKey = undefined;
             this.activeTutorialDocumentUri = undefined;
             this.activeTutorialOriginalContents = undefined;
             return;
@@ -667,7 +906,9 @@ class TutorialViewProvider {
         const state = this.readCompletionState();
         this.currentStepKey = key;
 
-        const shouldReset = message.restart === true || state[key] === true;
+        const shouldReset = step.sharedWorkspace
+            ? message.restart === true
+            : message.restart === true || state[key] === true;
 
         const openResult = step.requiresWorkspace
             ? await this.openWorkspaceTransitionStep(key)

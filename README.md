@@ -37,3 +37,12 @@ handleOnDidChangeTextEditorSelection = function (event) {
 Hilfsfunktionen wie `checkBox`, `setCheckBox`, `getCheckBox`, `selectionEquals`, `isCursorAt`, `addStepEventListener` und `onStepCleanup` stehen jedem Schritt zur Verfügung.
 
 Der Fortschritt wird in `~/.hs-kbd-tutorial/.state.json` gespeichert.
+
+
+## Datei- und Ordnerübungen
+
+Das Kapitel **Dateien, Ordner und Tabs** verwendet einen einzigen isolierten
+Arbeitsordner unter `~/.hs-kbd-tutorial/Tastatur-Tutorial`. Seine Struktur
+bleibt während des gesamten Kapitels sichtbar. Die einzelnen Schritte öffnen
+oder verändern nur die jeweils benötigten Einträge; sie tauschen nicht mehr
+den kompletten Explorer-Inhalt aus.

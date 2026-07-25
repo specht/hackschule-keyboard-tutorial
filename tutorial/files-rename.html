@@ -1,5 +1,12 @@
 <yaml>
-workspace: tutorial/workspace/files-rename
+workspace: tutorial/workspace/files-chapter
+sharedWorkspace: files
+sharedWorkspaceVersion: 2
+resetPaths:
+  - entwurf.txt
+  - bericht.txt
+  - bilder-alt
+  - bilder-archiv
 </yaml>
 
 <h2>Dateien und Ordner umbenennen</h2>
@@ -28,7 +35,7 @@ handleOnDidRenameFiles = function(e) {
 
         if (
             file.oldUri.relativePath === 'bilder-alt' &&
-            file.newUri.relativePath === 'bilder'
+            file.newUri.relativePath === 'bilder-archiv'
         ) {
             folderRenamed = true;
             setCheckBox('s1', true);
@@ -55,7 +62,7 @@ table.insertAdjacentHTML('beforeend', `
         <td style="width: 1.2em;">${checkBox('s1')}</td>
         <td>
             Benenne den Ordner <code>bilder-alt</code> in
-            <code>bilder</code> um.
+            <code>bilder-archiv</code> um.
         </td>
     </tr>
 `);
